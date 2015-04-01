@@ -7,7 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		A86923FA1ACB3CF1000CE7DA /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = A86923F91ACB3CF1000CE7DA /* main.c */; };
+		A8F96B091ACBD0E100686F29 /* alloc.c in Sources */ = {isa = PBXBuildFile; fileRef = A8F96B081ACBD0E100686F29 /* alloc.c */; };
+		A8F96B161ACBD14800686F29 /* execute-command.c in Sources */ = {isa = PBXBuildFile; fileRef = A8F96B0E1ACBD14800686F29 /* execute-command.c */; };
+		A8F96B171ACBD14800686F29 /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = A8F96B0F1ACBD14800686F29 /* main.c */; };
+		A8F96B181ACBD14800686F29 /* Makefile in Sources */ = {isa = PBXBuildFile; fileRef = A8F96B101ACBD14800686F29 /* Makefile */; };
+		A8F96B191ACBD14800686F29 /* print-command.c in Sources */ = {isa = PBXBuildFile; fileRef = A8F96B111ACBD14800686F29 /* print-command.c */; };
+		A8F96B1A1ACBD14800686F29 /* read-command.c in Sources */ = {isa = PBXBuildFile; fileRef = A8F96B121ACBD14800686F29 /* read-command.c */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -24,7 +29,19 @@
 
 /* Begin PBXFileReference section */
 		A86923F61ACB3CF1000CE7DA /* Lab 1 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "Lab 1"; sourceTree = BUILT_PRODUCTS_DIR; };
-		A86923F91ACB3CF1000CE7DA /* main.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
+		A8F96B081ACBD0E100686F29 /* alloc.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = alloc.c; sourceTree = SOURCE_ROOT; };
+		A8F96B0A1ACBD14800686F29 /* alloc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = alloc.h; sourceTree = SOURCE_ROOT; };
+		A8F96B0B1ACBD14800686F29 /* check-dist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = "check-dist"; sourceTree = SOURCE_ROOT; };
+		A8F96B0C1ACBD14800686F29 /* command-internals.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "command-internals.h"; sourceTree = SOURCE_ROOT; };
+		A8F96B0D1ACBD14800686F29 /* command.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = command.h; sourceTree = SOURCE_ROOT; };
+		A8F96B0E1ACBD14800686F29 /* execute-command.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "execute-command.c"; sourceTree = SOURCE_ROOT; };
+		A8F96B0F1ACBD14800686F29 /* main.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = SOURCE_ROOT; };
+		A8F96B101ACBD14800686F29 /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = SOURCE_ROOT; };
+		A8F96B111ACBD14800686F29 /* print-command.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "print-command.c"; sourceTree = SOURCE_ROOT; };
+		A8F96B121ACBD14800686F29 /* read-command.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "read-command.c"; sourceTree = SOURCE_ROOT; };
+		A8F96B131ACBD14800686F29 /* README */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = README; sourceTree = SOURCE_ROOT; };
+		A8F96B141ACBD14800686F29 /* test-p-bad.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = "test-p-bad.sh"; sourceTree = SOURCE_ROOT; };
+		A8F96B151ACBD14800686F29 /* test-p-ok.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = "test-p-ok.sh"; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -57,7 +74,19 @@
 		A86923F81ACB3CF1000CE7DA /* Lab 1 */ = {
 			isa = PBXGroup;
 			children = (
-				A86923F91ACB3CF1000CE7DA /* main.c */,
+				A8F96B0A1ACBD14800686F29 /* alloc.h */,
+				A8F96B0B1ACBD14800686F29 /* check-dist */,
+				A8F96B0C1ACBD14800686F29 /* command-internals.h */,
+				A8F96B0D1ACBD14800686F29 /* command.h */,
+				A8F96B0E1ACBD14800686F29 /* execute-command.c */,
+				A8F96B0F1ACBD14800686F29 /* main.c */,
+				A8F96B101ACBD14800686F29 /* Makefile */,
+				A8F96B111ACBD14800686F29 /* print-command.c */,
+				A8F96B121ACBD14800686F29 /* read-command.c */,
+				A8F96B131ACBD14800686F29 /* README */,
+				A8F96B141ACBD14800686F29 /* test-p-bad.sh */,
+				A8F96B151ACBD14800686F29 /* test-p-ok.sh */,
+				A8F96B081ACBD0E100686F29 /* alloc.c */,
 			);
 			path = "Lab 1";
 			sourceTree = "<group>";
@@ -118,7 +147,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A86923FA1ACB3CF1000CE7DA /* main.c in Sources */,
+				A8F96B191ACBD14800686F29 /* print-command.c in Sources */,
+				A8F96B091ACBD0E100686F29 /* alloc.c in Sources */,
+				A8F96B161ACBD14800686F29 /* execute-command.c in Sources */,
+				A8F96B1A1ACBD14800686F29 /* read-command.c in Sources */,
+				A8F96B181ACBD14800686F29 /* Makefile in Sources */,
+				A8F96B171ACBD14800686F29 /* main.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -202,6 +236,7 @@
 		A86923FE1ACB3CF1000CE7DA /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				GCC_C_LANGUAGE_STANDARD = gnu11;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -209,6 +244,7 @@
 		A86923FF1ACB3CF1000CE7DA /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				GCC_C_LANGUAGE_STANDARD = gnu11;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
@@ -232,6 +268,7 @@
 				A86923FF1ACB3CF1000CE7DA /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
