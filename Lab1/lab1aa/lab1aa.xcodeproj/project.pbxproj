@@ -7,12 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		1844473D1ACEF4E8001D680D /* alloc.c in Sources */ = {isa = PBXBuildFile; fileRef = 184447301ACEF4E8001D680D /* alloc.c */; };
-		1844473E1ACEF4E8001D680D /* execute-command.c in Sources */ = {isa = PBXBuildFile; fileRef = 184447351ACEF4E8001D680D /* execute-command.c */; };
-		1844473F1ACEF4E8001D680D /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = 184447361ACEF4E8001D680D /* main.c */; };
-		184447401ACEF4E8001D680D /* Makefile in Sources */ = {isa = PBXBuildFile; fileRef = 184447371ACEF4E8001D680D /* Makefile */; };
-		184447411ACEF4E8001D680D /* print-command.c in Sources */ = {isa = PBXBuildFile; fileRef = 184447381ACEF4E8001D680D /* print-command.c */; };
-		184447421ACEF4E8001D680D /* read-command.c in Sources */ = {isa = PBXBuildFile; fileRef = 184447391ACEF4E8001D680D /* read-command.c */; };
+		184447501ACEF60E001D680D /* alloc.c in Sources */ = {isa = PBXBuildFile; fileRef = 184447431ACEF60E001D680D /* alloc.c */; };
+		184447511ACEF60E001D680D /* execute-command.c in Sources */ = {isa = PBXBuildFile; fileRef = 184447481ACEF60E001D680D /* execute-command.c */; };
+		184447521ACEF60E001D680D /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = 184447491ACEF60E001D680D /* main.c */; };
+		184447531ACEF60E001D680D /* Makefile in Sources */ = {isa = PBXBuildFile; fileRef = 1844474A1ACEF60E001D680D /* Makefile */; };
+		184447541ACEF60E001D680D /* print-command.c in Sources */ = {isa = PBXBuildFile; fileRef = 1844474B1ACEF60E001D680D /* print-command.c */; };
+		184447551ACEF60E001D680D /* read-command.c in Sources */ = {isa = PBXBuildFile; fileRef = 1844474C1ACEF60E001D680D /* read-command.c */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -29,19 +29,19 @@
 
 /* Begin PBXFileReference section */
 		184447251ACEF4D8001D680D /* lab1aa */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = lab1aa; sourceTree = BUILT_PRODUCTS_DIR; };
-		184447301ACEF4E8001D680D /* alloc.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = alloc.c; sourceTree = "<group>"; };
-		184447311ACEF4E8001D680D /* alloc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = alloc.h; sourceTree = "<group>"; };
-		184447321ACEF4E8001D680D /* check-dist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = "check-dist"; sourceTree = "<group>"; };
-		184447331ACEF4E8001D680D /* command-internals.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "command-internals.h"; sourceTree = "<group>"; };
-		184447341ACEF4E8001D680D /* command.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = command.h; sourceTree = "<group>"; };
-		184447351ACEF4E8001D680D /* execute-command.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "execute-command.c"; sourceTree = "<group>"; };
-		184447361ACEF4E8001D680D /* main.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
-		184447371ACEF4E8001D680D /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
-		184447381ACEF4E8001D680D /* print-command.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "print-command.c"; sourceTree = "<group>"; };
-		184447391ACEF4E8001D680D /* read-command.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "read-command.c"; sourceTree = "<group>"; };
-		1844473A1ACEF4E8001D680D /* README */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = README; sourceTree = "<group>"; };
-		1844473B1ACEF4E8001D680D /* test-p-bad.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = "test-p-bad.sh"; sourceTree = "<group>"; };
-		1844473C1ACEF4E8001D680D /* test-p-ok.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = "test-p-ok.sh"; sourceTree = "<group>"; };
+		184447431ACEF60E001D680D /* alloc.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = alloc.c; sourceTree = SOURCE_ROOT; };
+		184447441ACEF60E001D680D /* alloc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = alloc.h; sourceTree = SOURCE_ROOT; };
+		184447451ACEF60E001D680D /* check-dist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = "check-dist"; sourceTree = SOURCE_ROOT; };
+		184447461ACEF60E001D680D /* command-internals.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "command-internals.h"; sourceTree = SOURCE_ROOT; };
+		184447471ACEF60E001D680D /* command.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = command.h; sourceTree = SOURCE_ROOT; };
+		184447481ACEF60E001D680D /* execute-command.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "execute-command.c"; sourceTree = SOURCE_ROOT; };
+		184447491ACEF60E001D680D /* main.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = SOURCE_ROOT; };
+		1844474A1ACEF60E001D680D /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = SOURCE_ROOT; };
+		1844474B1ACEF60E001D680D /* print-command.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "print-command.c"; sourceTree = SOURCE_ROOT; };
+		1844474C1ACEF60E001D680D /* read-command.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "read-command.c"; sourceTree = SOURCE_ROOT; };
+		1844474D1ACEF60E001D680D /* README */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = README; sourceTree = SOURCE_ROOT; };
+		1844474E1ACEF60E001D680D /* test-p-bad.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = "test-p-bad.sh"; sourceTree = SOURCE_ROOT; };
+		1844474F1ACEF60E001D680D /* test-p-ok.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = "test-p-ok.sh"; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -74,30 +74,21 @@
 		184447271ACEF4D8001D680D /* lab1aa */ = {
 			isa = PBXGroup;
 			children = (
-				1844472F1ACEF4E8001D680D /* lab1-Skeleton */,
+				184447431ACEF60E001D680D /* alloc.c */,
+				184447441ACEF60E001D680D /* alloc.h */,
+				184447451ACEF60E001D680D /* check-dist */,
+				184447461ACEF60E001D680D /* command-internals.h */,
+				184447471ACEF60E001D680D /* command.h */,
+				184447481ACEF60E001D680D /* execute-command.c */,
+				184447491ACEF60E001D680D /* main.c */,
+				1844474A1ACEF60E001D680D /* Makefile */,
+				1844474B1ACEF60E001D680D /* print-command.c */,
+				1844474C1ACEF60E001D680D /* read-command.c */,
+				1844474D1ACEF60E001D680D /* README */,
+				1844474E1ACEF60E001D680D /* test-p-bad.sh */,
+				1844474F1ACEF60E001D680D /* test-p-ok.sh */,
 			);
 			path = lab1aa;
-			sourceTree = "<group>";
-		};
-		1844472F1ACEF4E8001D680D /* lab1-Skeleton */ = {
-			isa = PBXGroup;
-			children = (
-				184447301ACEF4E8001D680D /* alloc.c */,
-				184447311ACEF4E8001D680D /* alloc.h */,
-				184447321ACEF4E8001D680D /* check-dist */,
-				184447331ACEF4E8001D680D /* command-internals.h */,
-				184447341ACEF4E8001D680D /* command.h */,
-				184447351ACEF4E8001D680D /* execute-command.c */,
-				184447361ACEF4E8001D680D /* main.c */,
-				184447371ACEF4E8001D680D /* Makefile */,
-				184447381ACEF4E8001D680D /* print-command.c */,
-				184447391ACEF4E8001D680D /* read-command.c */,
-				1844473A1ACEF4E8001D680D /* README */,
-				1844473B1ACEF4E8001D680D /* test-p-bad.sh */,
-				1844473C1ACEF4E8001D680D /* test-p-ok.sh */,
-			);
-			name = "lab1-Skeleton";
-			path = "../../lab1-Skeleton Code/lab1-Skeleton";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -156,12 +147,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				184447401ACEF4E8001D680D /* Makefile in Sources */,
-				1844473F1ACEF4E8001D680D /* main.c in Sources */,
-				1844473D1ACEF4E8001D680D /* alloc.c in Sources */,
-				1844473E1ACEF4E8001D680D /* execute-command.c in Sources */,
-				184447411ACEF4E8001D680D /* print-command.c in Sources */,
-				184447421ACEF4E8001D680D /* read-command.c in Sources */,
+				184447531ACEF60E001D680D /* Makefile in Sources */,
+				184447511ACEF60E001D680D /* execute-command.c in Sources */,
+				184447551ACEF60E001D680D /* read-command.c in Sources */,
+				184447501ACEF60E001D680D /* alloc.c in Sources */,
+				184447541ACEF60E001D680D /* print-command.c in Sources */,
+				184447521ACEF60E001D680D /* main.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
