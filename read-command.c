@@ -4,6 +4,7 @@
 #include "command-internals.h"
 
 
+
 #ifdef __APPLE__
 #include <err.h>
 #define error(args...) errc(args)
@@ -14,8 +15,29 @@
 /* FIXME: You may need to add #include directives, macro definitions,
    static function definitions, etc.  */
 
+//additional includes
+#include "stdio.h"
+#include "stdlib.h"
+#include "ctype.h"
+//end of additional includes
+
 /* FIXME: Define the type 'struct command_stream' here.  This should
    complete the incomplete type declaration in command.h.  */
+
+
+//auxiliary functions
+bool isWord (char c)
+{
+    return (isalpha(c) || isdigit(c) || (c == '!') || (c == '%') || (c == '+') || (c == ',') ||
+            (c == '-') || (c == '.') || (c == '/') || (c == ':') || (c == '@') || (c == '^') || (c == '_') );
+    
+}
+
+bool isSpecial (char c)
+{
+    return ( (c == ';') || (c == '|') || (c == '(') || (c == ')') || (c == '<') || (c == '>') );
+}
+//end of auxiliary functions
 
 command_stream_t
 make_command_stream (int (*get_next_byte) (void *),
@@ -27,7 +49,7 @@ make_command_stream (int (*get_next_byte) (void *),
   error (1, 0, "command reading not yet implemented");
   return 0;
 }
-
+    
 command_t
 read_command_stream (command_stream_t s)
 {
