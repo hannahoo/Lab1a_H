@@ -1,7 +1,7 @@
 // UCLA CS 111 Lab 1 command reading
 
 #include "command.h"
-#include "command-internals.h"
+//#include "command-internals.h"
 
 //#include <error.h>
 
