@@ -37,6 +37,11 @@ bool isSpecial (char c)
 {
     return ( (c == ';') || (c == '|') || (c == '(') || (c == ')') || (c == '<') || (c == '>') );
 }
+
+bool isNotValid (char c)
+{
+    return ( (c!=' ') && (c!='#') && (c!='\n') && (!isWord(c)) && (!isSpecial(c)) );
+}
 //end of auxiliary functions
 
 command_stream_t
