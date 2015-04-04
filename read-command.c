@@ -16,9 +16,10 @@
    static function definitions, etc.  */
 
 //additional includes
-#include "stdio.h"
-#include "stdlib.h"
-#include "ctype.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <ctype.h>
+#include "alloc.h"
 //end of additional includes
 
 /* FIXME: Define the type 'struct command_stream' here.  This should
@@ -44,6 +45,28 @@ bool isNotValid (char c)
 }
 //end of auxiliary functions
 
+//initialize command
+command_t init_command(enum command_type type)
+{
+    command_t command=(command_t)checked_malloc(sizeof(struct command));
+    command->type=type;
+    command->status=-1;
+    command->input=NULL;
+    command->output=NULL;
+    return command;
+}
+
+
+//initialize command stream
+command_stream_t init_stream()
+{
+    command_stream_t stream=(command_stream_t) checked_malloc(sizeof(struct command_stream));
+    stream->head=NULL;
+    stream->tail=NULL;
+    stream->cursor=NULL;
+    return stream;
+}
+
 command_stream_t
 make_command_stream (int (*get_next_byte) (void *),
 		     void *get_next_byte_argument)
@@ -58,7 +81,13 @@ make_command_stream (int (*get_next_byte) (void *),
 command_t
 read_command_stream (command_stream_t s)
 {
-  /* FIXME: Replace this with your implementation too.  */
-  error (1, 0, "command reading not yet implemented");
-  return 0;
+    if (s->cursor==NULL)
+    {
+        return NULL;
+    }
+    command_t tmp=s->cursor->c;
+    s->cursor=s->cursor->next;
+    return tmp;
+    
+  
 }

@@ -46,4 +46,6 @@ struct command_node
 struct command_stream
 {
     struct command_node* head;
+    struct command_node* tail;
+    struct command_node* cursor;
 };
