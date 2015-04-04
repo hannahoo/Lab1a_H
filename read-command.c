@@ -3,6 +3,7 @@
 #include "command.h"
 #include "command-internals.h"
 
+#include "alloc.h"
 
 
 #ifdef __APPLE__
@@ -19,7 +20,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
-#include "alloc.h"
+#include <string.h>
+
 //end of additional includes
 
 /* FIXME: Define the type 'struct command_stream' here.  This should
@@ -66,6 +68,52 @@ command_stream_t init_stream()
     stream->cursor=NULL;
     return stream;
 }
+
+//create simple command
+command_t store_simple_command ()
+{
+    command_t command= init_command(SIMPLE_COMMAND);
+    return command;
+}
+
+//create subshell command
+command_t store_subshell_command()
+{
+    command_t command= init_command(SUBSHELL_COMMAND);
+    return command;
+}
+
+//create compound command
+command_t store_compound_command()
+{
+    return NULL;
+}
+
+//create the tree. operator stack and command stack
+
+//precedance
+int precedence (char *operator)
+{
+ /*
+  lowest --> highest
+  ; \n    1
+  &&/||   2
+  |       3
+*/
+    if (strcmp(operator,";")==0)
+        return 1;
+    else if (strcmp(operator,"\n")==0)
+        return 1;
+    else if (strcmp(operator,"&&")==0)
+        return 2;
+    else if (strcmp(operator,"||")==0)
+        return 2;
+    else if (strcmp(operator,"|")==0)
+        return 3;
+    else
+        return -1;
+}
+
 
 command_stream_t
 make_command_stream (int (*get_next_byte) (void *),
