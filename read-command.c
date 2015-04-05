@@ -137,6 +137,36 @@ command_t store_simple_command (char *c, int *i, const int size)
                 (*i)++;
             }
         }
+        else if (tmp_c=='<')
+        {
+            if (command->input)
+            {
+                fprintf(stderr,"line %d: There are more than one input. \n",line_number);
+                exit(1);
+            }
+            (*i)++;
+            command->input=get_next_word(c, i, size);
+            if (command->input==NULL)
+            {
+                fprintf(stderr,"line %d: There is no input file name. \n",line_number);
+                exit(1);
+            }
+        }
+        else if (tmp_c=='>')
+        {
+            if (command->output)
+            {
+                fprintf(stderr,"line %d: There are more than one output. \n",line_number);
+                exit(1);
+            }
+            (*i)++;
+            command->output=get_next_word(c, i, size);
+            if (command->output==NULL)
+            {
+                fprintf(stderr,"line %d: There is no output file name. \n",line_number);
+                exit(1);
+            }
+        }
         else if (isSpecial(tmp_c))
         {
             (*i)++;
@@ -147,9 +177,10 @@ command_t store_simple_command (char *c, int *i, const int size)
             fprintf(stderr,"line %d: character, '%c', is not valid. \n", line_number, tmp_c );
             exit(1);
         }
+        
     }
     
-    
+    (*i)--;
     return command;
 }
 
