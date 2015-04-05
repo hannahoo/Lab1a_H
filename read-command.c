@@ -28,6 +28,9 @@
    complete the incomplete type declaration in command.h.  */
 
 
+//global variable
+int line_number;
+
 //auxiliary functions
 bool isWord (char c)
 {
@@ -112,6 +115,49 @@ int precedence (char *operator)
         return 3;
     else
         return -1;
+}
+
+char *get_next_word (char *c, int *i, const int size)
+{
+    while ( ((c[*i]==' ') || (c[*i]=='\t') || (c[*i]=='#')) && (*c<size) )
+    {
+        if (c[*i]=='#')
+        {
+            while (*c<size)
+            {
+                if (c[*i]=='\n')
+                {
+                    line_number++;
+                    break;
+                }
+                (*i)++;
+            }
+        }
+        (*i)++;
+    }
+    
+    int skipped=*i;
+    
+    while (isWord(c[*i]) && *i<size)
+        (*i)++;
+    int size_word=(*i)-skipped;
+    
+    if (size_word == 0)
+        return NULL;
+    char *word=(char *)malloc(sizeof(char)*(size_word+1) );
+    
+    int t=0;
+    while (t<size_word)
+    {
+        word[t]=c[skipped+t];
+        t++;
+    }
+    word[size_word]='\0';
+    
+    if (c[*i]=='#' || c[*i]=='<' || c[*i]=='>' || c[*i]=='\n' || isSpecial(c[*i]) )
+        (*i)--;
+    
+    return word;
 }
 
 

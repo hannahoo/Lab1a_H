@@ -10,6 +10,30 @@ enum command_type
     SUBSHELL_COMMAND,    // ( A )
   };
 
+//each command/operator/others as token
+//precedence low to high
+/*
+ 
+ lowest --> highest
+ ; \n
+ &&/||
+ |
+
+ */
+enum token
+{
+    SEMICOLON,
+    NEWLINE,
+    AND,
+    OR,
+    PIPE,
+    LEFTPAREN,
+    RIGHTPAREN,
+    LESSTHAN,
+    GREATERTHAN,
+    WORD
+};
+
 // Data associated with a command.
 struct command
 {
@@ -35,7 +59,12 @@ struct command
   } u;
 };
 
-//added 
+
+
+//added
+
+
+//each node of the command tree
 struct command_node
 {
     struct command *c;
@@ -43,6 +72,7 @@ struct command_node
 
 };
 
+//linked list of the command tree
 struct command_stream
 {
     struct command_node* head;
