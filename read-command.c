@@ -27,6 +27,17 @@
 /* FIXME: Define the type 'struct command_stream' here.  This should
    complete the incomplete type declaration in command.h.  */
 
+//auxiliary functions declarations
+bool isWord (char c);
+bool isSpecial (char c);
+bool isNotValid (char c);
+command_t init_command(enum command_type type);
+command_stream_t init_stream();
+command_t store_simple_command (char *c, int *i, const int size);
+int precedence (char *operator);
+char *get_next_word (char *c, int *i, const int size);
+
+
 
 //global variable
 int line_number;
@@ -72,10 +83,73 @@ command_stream_t init_stream()
     return stream;
 }
 
-//create simple command
-command_t store_simple_command ()
+
+//create simple command (consists of one or more words)
+command_t store_simple_command (char *c, int *i, const int size)
 {
     command_t command= init_command(SIMPLE_COMMAND);
+    int size_word=1;
+    int count_w=0;
+    command->u.word=(char**)malloc(sizeof(char*)*size_word);
+    //char *w=get_next_word(c, i, size);
+    
+    while ((*i)<size)
+    {
+        char tmp_c=c[*i];
+        switch(tmp_c)
+        {
+            case(' '):
+            case('\t'):
+                (*i)++;
+                break;
+            case('\n'):
+                line_number++;
+                (*i)++;
+                break;
+            default://indirections < >...etc
+                (*i)++;
+                break;
+        }
+        if (isWord(tmp_c))
+        {
+            char *w=get_next_word(c, i, size);
+            
+            if (count_w==size_word)
+            {
+                size_word=size_word*2;
+                command->u.word=realloc(command->u.word,sizeof(char*)*size_word);
+            }
+            command->u.word[count_w]=w;//entire word
+            count_w++;
+            command->u.word[count_w]=NULL;
+            
+        }
+        else if (tmp_c=='#')
+        {
+            //skip comment
+            while (*i<size)
+            {
+                if (c[*i]=='\n')
+                {
+                    line_number++;
+                    break;
+                }
+                (*i)++;
+            }
+        }
+        else if (isSpecial(tmp_c))
+        {
+            (*i)++;
+            break;
+        }
+        else if (isNotValid(tmp_c))
+        {
+            fprintf(stderr,"line %d: character, '%c', is not valid. \n", line_number, tmp_c );
+            exit(1);
+        }
+    }
+    
+    
     return command;
 }
 
@@ -117,13 +191,14 @@ int precedence (char *operator)
         return -1;
 }
 
+//char c: start of command. i: index of array
 char *get_next_word (char *c, int *i, const int size)
 {
     while ( ((c[*i]==' ') || (c[*i]=='\t') || (c[*i]=='#')) && (*c<size) )
     {
         if (c[*i]=='#')
         {
-            while (*c<size)
+            while (*i<size)
             {
                 if (c[*i]=='\n')
                 {
@@ -160,16 +235,39 @@ char *get_next_word (char *c, int *i, const int size)
     return word;
 }
 
+//get operator function??
+
 
 command_stream_t
 make_command_stream (int (*get_next_byte) (void *),
 		     void *get_next_byte_argument)
 {
+    size_t buf_size=2048;
+    size_t read_size=0;
+    int c;
+    char *buf=checked_malloc(buf_size);
+    
+    while ((c=get_next_byte(get_next_byte_argument))!=EOF)
+    {
+        buf[read_size++]=c;
+        if(read_size==buf_size)
+        {
+            buf_size=buf_size*2;
+            buf=(char*)checked_grow_alloc(buf,&buf_size );
+        }
+    }
+    
+    command_stream_t stream=init_stream();
+    
+    return stream;
+    
   /* FIXME: Replace this with your implementation.  You may need to
      add auxiliary functions and otherwise modify the source code.
      You can also use external functions defined in the GNU C Library.  */
-  error (1, 0, "command reading not yet implemented");
-  return 0;
+    
+    
+  //error (1, 0, "command reading not yet implemented");
+  //return 0;
 }
     
 command_t
