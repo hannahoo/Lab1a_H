@@ -32,6 +32,9 @@ get_next_byte (void *stream)
 int
 main (int argc, char **argv)
 {
+    
+    
+    
   int command_number = 1;
   bool print_tree = false;
   bool time_travel = false;
