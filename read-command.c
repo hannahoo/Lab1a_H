@@ -23,9 +23,9 @@
 #include <string.h>
 
 //end of additional includes
-#define OPERATOR_LEN 32;
-#define COMMAND_LEN 16;
-#define WORD_LEN 16;
+const int  OPERATOR_LEN =16;
+const int  COMMAND_LEN =16;
+const int WORD_LEN =16;
 
 /* FIXME: Define the type 'struct command_stream' here.  This should
    complete the incomplete type declaration in command.h.  */
@@ -37,10 +37,11 @@ bool isNotValid (char c);
 enum command_type cmd_type(char *cc);
 command_t init_command(enum command_type type);
 command_stream_t init_stream();
-command_t store_simple_command (char *c, int *i, const int size);
+command_t store_simple_command (char *c, int *i, size_t size);
 int precedence (char *operator);
-char *get_next_word (char *c, int *i, const int size);
-
+char* get_next_word (char *c, int *i, size_t size);
+void init_op_stack();
+void init_cmd_stack();
 
 
 //global variable
@@ -112,126 +113,85 @@ command_stream_t init_stream()
     return stream;
 }
 
+char* get_next_wordd (char *c, int *i, size_t size  )
+{
+    int starting=*i;
+    int size_word=0;
+    while (isWord(c[*i]) && (*i)<size)
+    {
+        size_word++;
+        (*i)++;
+    }
+    char *word=(char *)checked_malloc(sizeof(char)*(size_word+1) );
+    if (size_word == 0)
+        return NULL;
+    int j=0;
+    while (j<size_word)
+    {
+        word[j]=c[starting+j];
+        j++;
+    }
+    word[size_word]='\0';
+    return word;
+}
 
 //create simple command (consists of one or more words)
-command_t store_simple_command (char *c, int *i, const int size = WORD_LEN )
+command_t store_simple_command (char *c, int *i, size_t size ) // to avoid similar name with build-in function
 {
     command_t command= init_command(SIMPLE_COMMAND);
-    int size_word=COMMAND_LEN;
+    int size_word=1;
     int count_w=0;
     command->u.word=(char**)malloc(sizeof(char*)*size_word);
+    
    // store words instead of store pointers
-    for(int i=0;i<size_word;i++)
-        command->u.word[i]=(char*)malloc(sizeof(char)*size);
+    for(int j=0;j<size_word;j++) // j instead of i
+        command->u.word[j]=(char*)malloc(sizeof(char)*size);
  
-    //char *w=get_next_word(c, i, size);
     
     while ((*i)<size)
     {
         char tmp_c=c[*i];
-        switch(tmp_c)
+        //if meet operator, then return command
+        if (tmp_c==' ' || tmp_c=='\t')
         {
-            case(' '):
-            case('\t'):
-                (*i)++;
-                break;
-            case('\n'):
-                line_number++;
-                (*i)++;
-                break;
-            default:
-                (*i)++;
-                break;
+            (*i)++;
         }
-        if (isWord(tmp_c))
+        else if (isWord(tmp_c))
         {
-            char *w=get_next_word(c, i, size);
-            
+            char* w= get_next_word(c, i, size);
             if (count_w==size_word)
             {
- 
-                command->u.word=realloc(command->u.word,sizeof(char*)*size_word); // 2*size_word???
-                // size_word=size_word*2;
+                size_word=size_word*2;
+                command->u.word=realloc(command->u.word,sizeof(char*)*size_word);
             }
-            // store it
-            strcpy(command->u.word[count_w],w);
-            //entire word
+            command->u.word[count_w]=w;//entire word
             count_w++;
             command->u.word[count_w]=NULL;
-            
-        }
-        else if (tmp_c=='#')
-        {
-            //skip comment
-            while (*i<size)
-            {
-                if (c[*i]=='\n')
-                {
-                    line_number++;
-                    break;
-                }
-                (*i)++;
-            }
-        }
-        else if (tmp_c=='<')
-        {
-            if (command->input)
-            {
-                fprintf(stderr,"line %d: There are more than one input. \n",line_number);
-                exit(1);
-            }
-            (*i)++;
-            command->input=get_next_word(c, i, size);
-            if (command->input==NULL)
-            {
-                fprintf(stderr,"line %d: There is no input file name. \n",line_number);
-                exit(1);
-            }
-        }
-        else if (tmp_c=='>')
-        {
-            if (command->output)
-            {
-                fprintf(stderr,"line %d: There are more than one output. \n",line_number);
-                exit(1);
-            }
-            (*i)++;
-            command->output=get_next_word(c, i, size);
-            if (command->output==NULL)
-            {
-                fprintf(stderr,"line %d: There is no output file name. \n",line_number);
-                exit(1);
-            }
-        }
-        else if (isSpecial(tmp_c))
-        {
-            (*i)++;
-            break;
         }
         else if (isNotValid(tmp_c))
         {
             fprintf(stderr,"line %d: character, '%c', is not valid. \n", line_number, tmp_c );
             exit(1);
         }
-        
+        else//meet an operator of any sort or others ...i.e. \n, < > #
+        {
+            (*i)--;//can deal with it later in make_comamnd_tree function
+            break;
+        }
     }
-    
-    (*i)--;
     return command;
 }
 
 
-//create the tree. operator stack and command stack
-
 //precedance
 int precedence (char *operator)
 {
- /*
-  lowest --> highest
-  ; \n    1
-  &&/||   2
-  |       3
-*/
+    /*
+     lowest --> highest
+     ; \n    1
+     &&/||   2
+     |       3
+     */
     if (strcmp(operator,";")==0)
         return 1;
     else if (strcmp(operator,"\n")==0)
@@ -244,50 +204,6 @@ int precedence (char *operator)
         return 3;
     else
         return -1;
-}
-
-//char c: start of command. i: index of array
-char *get_next_word (char *c, int *i, const int size =WORD_LEN )
-{
-    while ( ((c[*i]==' ') || (c[*i]=='\t') || (c[*i]=='#')) && (*c<size) )
-    {
-        if (c[*i]=='#')
-        {
-            while (*i<size)
-            {
-                if (c[*i]=='\n')
-                {
-                    line_number++;
-                    break;
-                }
-                (*i)++;
-            }
-        }
-        (*i)++;
-    }
-    
-    int skipped=*i;
-    
-    while (isWord(c[*i]) && *i<size)
-        (*i)++;
-    int size_word=(*i)-skipped;
-    
-    if (size_word == 0)
-        return NULL;
-    char *word=(char *)malloc(sizeof(char)*(size_word+1) );
-    
-    int t=0;
-    while (t<size_word)
-    {
-        word[t]=c[skipped+t];
-        t++;
-    }
-    word[size_word]='\0';
-    
-    if (c[*i]=='#' || c[*i]=='<' || c[*i]=='>' || c[*i]=='\n' || isSpecial(c[*i]) )
-        (*i)--;
-    
-    return word;
 }
 //***********************************************************************************
 
@@ -408,7 +324,7 @@ void pop_cmd(command_t cc)
 
 //********************************************************
 
-command_t build_command_t(char* buff, int* index)
+command_t build_command_t(char* buff, int* index, size_t ssize)// size=buff--read_size
 {
     // init operator stack and command stack
     
@@ -624,7 +540,7 @@ command_t build_command_t(char* buff, int* index)
                        if(wait_input)
                        {
                            *index=(*index)+1;
-                           char * text= get_next_word(buff, index);
+                           char* text= get_next_wordd(buff, index, ssize);
                            int len = sizeof(text)/sizeof(char);
                            cmd_s.command[cmd_s.top-1]->input = (char*) checked_malloc(sizeof(char)*len);
                            
@@ -637,7 +553,7 @@ command_t build_command_t(char* buff, int* index)
                        if(wait_output)
                        {
                            *index=(*index)+1;
-                           char * text= get_next_word(buff, index);
+                           char* text= get_next_word(buff, index, ssize);
                            int len = sizeof(text)/sizeof(char);
                            cmd_s.command[cmd_s.top-1]->output = (char*) checked_malloc(sizeof(char)*len);
                            strcpy(cmd_s.command[cmd_s.top-1]->output, text); // undefined text
@@ -646,7 +562,7 @@ command_t build_command_t(char* buff, int* index)
                        }
                 // simple command
                        *index=(*index)+1;
-                       command_t tmp=store_simple_command(buff, index);// things needed
+                       command_t tmp=store_simple_command(buff, index, ssize);// things needed
                        push_cmd( tmp);
                        break;
         }
@@ -694,13 +610,13 @@ make_command_stream (int (*get_next_byte) (void *),
     struct command_node* tmp_node= (struct command_node*) checked_malloc(sizeof(struct command_node));
     command_t tmp=NULL;
     int index=0 ;
-    tmp_node->c=build_command_t(buf,&index);
+    tmp_node->c=build_command_t(buf,&index,read_size );
     tmp_node->next=NULL;
     
     stream->head=tmp_node;
     stream->cursor=tmp_node;
     stream->tail=tmp_node;
-    tmp=build_command_t(buf, &index);
+    tmp=build_command_t(buf, &index, read_size);
     while(tmp!=NULL){
         stream->cursor->next =(struct command_node*) checked_malloc(sizeof(struct command_node));
         tmp_node->c  = tmp;
@@ -708,9 +624,10 @@ make_command_stream (int (*get_next_byte) (void *),
         // space alloc???
         stream->cursor->next = tmp_node;
         stream->cursor= stream->cursor->next;
-        tmp=build_command_t(buf, &index);
+        tmp=build_command_t(buf, &index, read_size);
     }
-          stream->tail=stream->cursor;
+    stream->tail=stream->cursor;
+    stream->cursor=stream->head;
           
           
     return stream;
