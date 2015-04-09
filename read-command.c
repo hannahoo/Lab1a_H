@@ -21,7 +21,7 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <string.h>
-
+ 
 //end of additional includes
 const int  OPERATOR_LEN =8;
 const int WORD_LEN =16;
