@@ -59,7 +59,7 @@ bool isWord (char c)
 
 bool isSpecial (char c)
 {
-    return ( (c == ';') || (c == '|') || (c == '(') || (c == ')') || (c == '<') || (c == '>') );
+    return ( (c == ';') || (c == '|') || (c == '(') || (c == ')') || (c == '<') || (c == '>') || (c == '&'));
 }
 
 bool isNotValid (char c)
@@ -78,7 +78,7 @@ enum command_type cmd_type(char *cc)
     if(!strcmp(cc,";")) return SEQUENCE_COMMAND;
     if(!strcmp(cc,"(")) return SUBSHELL_COMMAND;
     else {
-        err(1, "invalid type1");
+        err(1, "invalid type");
         return SIMPLE_COMMAND;
     }
     
@@ -323,6 +323,7 @@ void pop_cmd(command_t cc)
         error(1, 0, "%d: syntax error 2 command stack invalid pop", line_number);    }
     else{
         cc=cmd_s.command[cmd_s.top-1];
+        cmd_s.command[cmd_s.top-1]=NULL;
         cmd_s.top--;
     }
 }
@@ -362,7 +363,7 @@ command_t build_command_t(char* buff, int* index, size_t ssize)// size=buff--rea
                 push_op(";");
                 else{
                     
-                    while ( (precedence(op_s.operator[op_s.top])>=precedence(";")) &&(strcmp(op_s.operator[op_s.top-1],"(")!=0) &&(op_s.top>0))
+                    while ( (op_s.top>0)&&(precedence(op_s.operator[op_s.top-1])>=precedence(";")) &&(strcmp(op_s.operator[op_s.top-1],"(")!=0) )
                     {
                         char* tmp_op= (char*) malloc(OPERATOR_LEN*sizeof(char));
                         pop_op(tmp_op);
@@ -404,10 +405,11 @@ command_t build_command_t(char* buff, int* index, size_t ssize)// size=buff--rea
                         push_op("||");
                     else{
                         
-                        while ( (precedence(op_s.operator[op_s.top-1])>=precedence("||")) &&(strcmp(op_s.operator[op_s.top-1],"||")!=0)&&(op_s.top>0))
+                        while ( (op_s.top>0)&&(precedence(op_s.operator[op_s.top-1])>=precedence("||")) &&(strcmp(op_s.operator[op_s.top-1],"||")!=0))
                         {
                             char* tmp_op=(char*) malloc(OPERATOR_LEN*sizeof(char));;
                             pop_op(tmp_op);
+                            
                             command_t tmp=init_command(cmd_type(tmp_op));
                             pop_cmd( tmp->u.command[1]);
                             pop_cmd( tmp->u.command[0]);
@@ -419,13 +421,13 @@ command_t build_command_t(char* buff, int* index, size_t ssize)// size=buff--rea
                 }
                 else{ // case |
                     // check valid
-                    int i=(*index)-1;
+                    /*int i=(*index)-1;
                     while ((buff[i]!=' ') && (i>=0)) { // skip all ' ' to find if the previous is \n : | b
                         i--;
                     }
                     if (buff[i]=='\n') {
                         error(1, 0, "%d: syntax error 7 \n appears in wrong place", line_number);
-                    }
+                    }*/
                     /*if (op_s.top>=cmd_s.top) {
                         error(1, 0, "%d: syntax error 8 dismatched operator and command",line_number);
                     }*/
@@ -437,6 +439,7 @@ command_t build_command_t(char* buff, int* index, size_t ssize)// size=buff--rea
                         {
                             char* tmp_op=(char*) malloc(OPERATOR_LEN*sizeof(char));;
                             pop_op( tmp_op);
+                            printf("@@%s %d",tmp_op,op_s.top);
                             command_t tmp=init_command(cmd_type(tmp_op));
                             pop_cmd( tmp->u.command[1]);
                             pop_cmd(tmp->u.command[0]);
@@ -448,9 +451,13 @@ command_t build_command_t(char* buff, int* index, size_t ssize)// size=buff--rea
                 }
                 
                 // skip all space
-                while ((*index<ssize-1)&&((buff[*index+1==' ']||(buff[*index+1]=='\t')||(buff[*index+1]=='\n')))) {
+                while ((*index<ssize-1)&&((buff[*index+1]==' ')||(buff[*index+1]=='\t')||(buff[*index+1]=='\n'))) {
                     if (buff[*index+1]=='\n') {
                         line_number++;
+                    }
+                    if (line_number==20) {
+                    printf("%c",buff[*index+1]);
+                    
                     }
                     *index=*index+1;
                 }
@@ -467,11 +474,12 @@ command_t build_command_t(char* buff, int* index, size_t ssize)// size=buff--rea
                     if (op_s.top ==0)
                         push_op( "&&");
                     else{
-                        while ( (precedence(op_s.operator[op_s.top-1])>=precedence("&&")) &&(strcmp(op_s.operator[op_s.top-1],"&&")!=0)&&(op_s.top>0))
+                        while ((op_s.top>0)&& (precedence(op_s.operator[op_s.top-1])>=precedence("&&")) &&(strcmp(op_s.operator[op_s.top-1],"&&")!=0))
                         {
                             char* tmp_op=(char*) malloc(OPERATOR_LEN*sizeof(char));;
                             pop_op(tmp_op);
-                            command_t tmp=init_command(cmd_type(tmp_op));
+                            command_t tmp= (command_t)malloc(sizeof(struct command));
+                            tmp=init_command(cmd_type(tmp_op));
                             pop_cmd( tmp->u.command[1]);
                             pop_cmd( tmp->u.command[0]);
                             push_cmd( tmp);
@@ -484,7 +492,7 @@ command_t build_command_t(char* buff, int* index, size_t ssize)// size=buff--rea
                     error(1, 0, "%d: syntax error 10 invalid & ", line_number);
                 
                 // skip all space
-                while ((*index<ssize-1)&&((buff[*index+1==' ']||(buff[*index+1]=='\t')||(buff[*index+1]=='\n')))) {
+                while ((*index<ssize-1)&&((buff[*index+1]==' ')||(buff[*index+1]=='\t')||(buff[*index+1]=='\n'))) {
                     if (buff[*index+1]=='\n') {
                         line_number++;
                     }
@@ -546,7 +554,10 @@ command_t build_command_t(char* buff, int* index, size_t ssize)// size=buff--rea
                 while ((*index<ssize)&&(buff[*index] !='\n')) {
                     *index=(*index)+1;
                 }
-                line_number++;
+                if (*index != ssize) {
+                    line_number++;
+                }
+                
                 break;
             case ' ':
                        break;
@@ -554,7 +565,7 @@ command_t build_command_t(char* buff, int* index, size_t ssize)// size=buff--rea
                     break;
             case '\n':
                  line_number++;
-                // more details !!!!
+                //
                 if((op_s.top>=cmd_s.top) &&(cmd_s.top>0))
                     error(1, 0, "%d: syntax error 16 /n happens with dismatched operator and command", line_number);
                     // ? \n
@@ -572,7 +583,7 @@ command_t build_command_t(char* buff, int* index, size_t ssize)// size=buff--rea
                         push_op(";");
                     else{
                         
-                        while ( (precedence(op_s.operator[op_s.top])>=precedence(";")) &&(strcmp(op_s.operator[op_s.top-1],"(")!=0) &&(op_s.top>0))
+                        while ((op_s.top>0)&& (precedence(op_s.operator[op_s.top-1])>=precedence(";")) &&(strcmp(op_s.operator[op_s.top-1],"(")!=0) )
                         {
                             char* tmp_op=(char*) malloc(OPERATOR_LEN*sizeof(char));;
                             pop_op(tmp_op);
@@ -592,10 +603,11 @@ command_t build_command_t(char* buff, int* index, size_t ssize)// size=buff--rea
                     // skip all the \n
                     while(((buff[(*index)+1]=='\n')||(buff[*index+1]=='\t')||(buff[*index+1]==' '))&& (*index<ssize -1))
                     {
-                        *index=*index+1;
                         if (buff[(*index)+1]=='\n')
                             line_number++;
+                        *index=*index+1;
                     }
+                    
                     // return a tree
                     isReturn=true;
                 }
@@ -606,9 +618,7 @@ command_t build_command_t(char* buff, int* index, size_t ssize)// size=buff--rea
                        if(isNotValid(buff[*index]))
                        error(1, 0, "%d: syntax error 19 invalid input", line_number);
                        if (wait_input && wait_output)
-                       error (1, 0, "%d: syntax error 20 input output dismatch", line_number);
-                
-                
+                           error (1, 0, "%d: syntax error 20 input output dismatch", line_number);
                 //
                        if(wait_input)
                        {
@@ -616,11 +626,9 @@ command_t build_command_t(char* buff, int* index, size_t ssize)// size=buff--rea
                            char* text= get_next_word(buff, index, ssize);
                            int len = sizeof(text)/sizeof(char);
                            cmd_s.command[cmd_s.top-1]->input = (char*) checked_malloc(sizeof(char)*len);
-                           
                            strcpy(cmd_s.command[cmd_s.top-1]->input, text); // undefined text
-                           
+                           *index=*index-1;//to get back one step since there's a ++ at the end
                            wait_input=false;
-                           
                            break;
                        }
                        if(wait_output)
@@ -630,13 +638,14 @@ command_t build_command_t(char* buff, int* index, size_t ssize)// size=buff--rea
                            int len = sizeof(text)/sizeof(char);
                            cmd_s.command[cmd_s.top-1]->output = (char*) checked_malloc(sizeof(char)*len);
                            strcpy(cmd_s.command[cmd_s.top-1]->output, text); // undefined text
+                           *index=*index-1;//
                            wait_output =false;
                            break;
                        }
                 // simple command
                        //*index=(*index)+1;
                        command_t tmp=store_simple_command(buff, index, ssize);// things needed
-                       push_cmd( tmp);
+                       push_cmd(tmp);
                        break;
         }
         (*index)=(*index)+1;
@@ -645,8 +654,11 @@ command_t build_command_t(char* buff, int* index, size_t ssize)// size=buff--rea
     
     // pop all operators and commands
     if ((op_s.top>=cmd_s.top) &&(cmd_s.top>0))
+    {
+        
         error(1, 0, "%d: syntax error 21 dismatched operator and command", line_number);
-    
+    }
+
     while (op_s.top>0) {
          // only ; left
         if(op_s.top==1 && (strcmp(op_s.operator[0],";")==0)&&(cmd_s.top==1))
@@ -654,15 +666,19 @@ command_t build_command_t(char* buff, int* index, size_t ssize)// size=buff--rea
         
         char* tmp_op=(char*) malloc(OPERATOR_LEN*sizeof(char));;
         pop_op( tmp_op);
-        command_t tmp=init_command(cmd_type(tmp_op));
+        command_t tmp= (command_t) malloc(sizeof(struct command));
+        tmp=init_command(cmd_type(tmp_op));
         pop_cmd( tmp->u.command[1]);
         pop_cmd(tmp->u.command[0]);
         push_cmd( tmp);
         free(tmp);
     }
+    if (op_s.top==0 && (cmd_s.top==0)) {
+        return NULL;
+    }
     if ((op_s.top!=0)||(cmd_s.top!=1)) //
         error(1, 0, "%d: syntax error 22 dismatched operator and command", line_number);
-    // op.top==0 && cmd_s.top==1
+    
     return cmd_s.command[0];
     
 }
