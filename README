@@ -1,4 +1,12 @@
-This is a skeleton for CS 111 Lab 1.
+Group member: …, Han Wang(UID:104547543) 
+…
+we implement a build_command_t function to return a command tree to build a complete command stream. in order to check the syntax error, things are arranged as follows:
+1.for ;, we will check if ;;/<;/>;/\n; happens. And we will regard ;\n as a ;
+2. for other operators like | || &&, we will check if < or > appears right before them.
+and if \n appears before them.
+3. for ), we will check if it final meets a ) and if < or > appears before it.
+4. for < >, we will set the global variables: wait_input and wait_output as a signal. 
+And we will also check if </n or >/n happens.
+5. for \n, we will check if #operators matches with #commands, if it’s followed by specials other than ( ).
+6. when finish building, we will pop all the operators and commands and check it there’s only command left or nothing was pushed ever.
 
-Replace this README file with notes on your implementation.
-Mentions any special features or limitations.
