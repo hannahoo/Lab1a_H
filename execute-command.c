@@ -115,7 +115,7 @@ void execute_simple(command_t c)// c->word
     else if(p>0){
         int status;
         if(waitpid(p,&status,0)<0)// 0: blocking wait father process call wait
-            error(1,0 ,"waited process error");
+            error(1,0 ,"waited process error simple");
         c->status=WEXITSTATUS(status);
         
         if(fd[0]>=0)
@@ -138,7 +138,7 @@ void execute_and(command_t c)// c->command[2]
         int status;
         
         if(waitpid(p,&status,0)<0)//wait for child process exit to get signal
-            error(1,0,"waited process error");
+            error(1,0,"waited process error and 1");
         //waitpid return the pid of child process
         int exit_status=WEXITSTATUS(status);// in lib # include<sys/wait.h> 0-127
         if(exit_status==0)// successfully run
@@ -153,8 +153,8 @@ void execute_and(command_t c)// c->command[2]
             }
             
             else {
-                if(waitpid(p,&status,0)<0)//wait for child process exit to get signal
-                    error(1,0,"waited process error");
+                if(waitpid(q,&status,0)<0)//wait for child process exit to get signal
+                    error(1,0,"waited process error and 2");
                 exit_status=WEXITSTATUS(status);
                 c->status=exit_status;
             }
@@ -181,8 +181,8 @@ void execute_or(command_t c)// c->command[2]
     }
     else { // p>0 parent process
         int status;
-        if(waitpid(p,&status,0))
-            error(1,0,"waited process error");
+        if(waitpid(p,&status,0)<0)
+            error(1,0,"waited process error or 1");
         
         int exit_status=WEXITSTATUS(status);// in lib # include<sys/wait.h> 0-127
         if(exit_status!=0)// unsuccessfully run, then run second process
@@ -198,7 +198,7 @@ void execute_or(command_t c)// c->command[2]
             else
             {
                 if(waitpid(q,&status,0)<0)
-                    error(1,0,"waited process error");
+                    error(1,0,"waited process error or 2");
                 c->status=WEXITSTATUS(status);
             }
         }
@@ -223,7 +223,7 @@ void execute_sequence(command_t c) // wait for child to exit
     else {
         int status;
         if(waitpid(p,&status,0)<0)
-            error(1,0,"waited process error");
+            error(1,0,"waited process error sequence 1");
         //	c->status=WEXITSTATUS(status);// wait until the second process exit
         int q=fork();
         if(q<0)
@@ -235,8 +235,8 @@ void execute_sequence(command_t c) // wait for child to exit
         }
         else { // p>0 q>0 parent process
             
-            if(waitpid(p,&status,0)<0)// 0: blocking wait
-                error(1,0 ,"waited process error");
+            if(waitpid(q,&status,0)<0)// 0: blocking wait
+                error(1,0 ,"waited process error sequence 2");
             c->status=WEXITSTATUS(status);// another??!!!
         }
     }
@@ -275,7 +275,7 @@ void execute_subshell(command_t c)// c->subshell_command->(word,command[2])
     else {
         int status;
         if(waitpid(p,&status,0)<0)
-            error(1,0,"waited process error!");
+            error(1,0,"waited process error: subshell");
         c->status = WEXITSTATUS(status);
         
     }
