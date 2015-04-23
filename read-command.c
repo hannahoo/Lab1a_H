@@ -535,7 +535,7 @@ command_t build_command_t(char* buff, int* index, size_t ssize)// size=buff--rea
             case '#': // skip comments
               
 		while((*index<ssize)&&(buff[*index]=='#'))//skip all comments
-{
+		{
 		*index=*index+1;
 		// reach the end of each comment line
                 while ((*index<ssize)&&(buff[*index] !='\n')) {
@@ -546,13 +546,20 @@ command_t build_command_t(char* buff, int* index, size_t ssize)// size=buff--rea
 			// skip all \n following # and index points to the last \n
 			while(((*index+1)<ssize) &&(buff[*index+1]=='\n'))
 			{
+				if(op_s.top>0|| cmd_s.top>0){
+			//	printf("%d %d",op_s.top,cmd_s.top);
 				isReturn= true;
+				}
 				line_number++;
 				*index=*index+1;
 			}
+			if(*index<ssize-1 && buff[*index]=='\n')
+				*index=*index+1;
+
                     line_number++;
                 }
                 }
+		*index=*index-1;
                 break;
             case ' ':
                 break;
@@ -569,7 +576,7 @@ command_t build_command_t(char* buff, int* index, size_t ssize)// size=buff--rea
                     error(1, 0, "%d: syntax error 17 /n is before specials other than ( )",line_number);
                 
                 // regard as ; a /n b
-                if (buff[*index-1]!='\n' && (buff[*index +1]!='\n') &&(*index-1>=0)&&(*index+1<ssize)) {
+                if (cmd_s.top>0 && buff[*index-1]!='\n' && (buff[*index +1]!='\n') &&(*index-1>=0)&&(*index+1<ssize)) {
                     
                     
                     if (op_s.top ==0)
@@ -611,6 +618,7 @@ command_t build_command_t(char* buff, int* index, size_t ssize)// size=buff--rea
                     }
                     
                     // return a tree
+                    if(op_s.top>0 || cmd_s.top>0)
                     isReturn=true;
                 }
                 
