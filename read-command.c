@@ -337,9 +337,9 @@ command_t build_command_t(char* buff, int* index, size_t ssize)// size=buff--rea
                 break;
             case ';' :
                 // ;;
-                if (op_s.top>=cmd_s.top ) {
+                /*if (op_s.top>=cmd_s.top ) {
                     error(1, 0, "%d: syntax error 3 dismatched operator and command", line_number);
-                }
+                }*/
                 // >;
                 if(wait_input || wait_output)
                     error(1, 0, "%d: syntax error 3-2 < > happens at wrong place", line_number);
@@ -369,8 +369,8 @@ command_t build_command_t(char* buff, int* index, size_t ssize)// size=buff--rea
                     push_op( ";");
                     
                 }
-                // ; \n
-                if ((next<ssize)&&buff[next]=='\n') { // regard \n after; as a ;
+                // ; \n regard as consistent
+                if ((*index+1<ssize)&&buff[*index+1]=='\n') { // regard \n after; as a ;
                     *index=(*index)+1;
                     line_number++;
                 }
@@ -428,7 +428,7 @@ command_t build_command_t(char* buff, int* index, size_t ssize)// size=buff--rea
                     }
                 }
                 
-                // skip all space
+                // skip all space unitl find a word
                 while ((*index<ssize-1)&&((buff[*index+1]==' ')||(buff[*index+1]=='\t')||(buff[*index+1]=='\n'))) {
                     if (buff[*index+1]=='\n') {
                         line_number++;
@@ -507,22 +507,21 @@ command_t build_command_t(char* buff, int* index, size_t ssize)// size=buff--rea
                 
                 break;
             case '<':
-                if (((op_s.top-count_left_bracket)>=cmd_s.top))
+                /*if (((op_s.top-count_left_bracket)>=cmd_s.top))
                     error(1, 0, "%d: syntax error 12 dismatched operator and command",line_number);
-                
+                */
                 if((next<ssize)&&buff[next]=='\n')
                     error(1, 0, "%d: syntax error 13-1 < followed by newline ", line_number);
                 if(wait_input || wait_output)
                     error(1, 0, "%d: syntax error 13-2 < happens at wrong place", line_number);
-                //command_t tmp=store_simple_command();// things needed
-                //push_cmd(tmp);
+
                 wait_input=true;
                 break;
                 
             case '>':
-                if((op_s.top-count_left_bracket)>=cmd_s.top)
+               /* if((op_s.top-count_left_bracket)>=cmd_s.top)
                     error(1, 0, "%d: syntax error 14 dismatched operator and command",line_number);
-                
+                */
                 if((next<ssize)&&buff[next]=='\n')
                     error(1, 0, "%d: syntax error 15-1 > followed by newline ", line_number);
                 if(wait_input || wait_output)
@@ -534,32 +533,46 @@ command_t build_command_t(char* buff, int* index, size_t ssize)// size=buff--rea
                 
             case '#': // skip comments
               
-		while((*index<ssize)&&(buff[*index]=='#'))//skip all comments
-		{
-		*index=*index+1;
-		// reach the end of each comment line
-                while ((*index<ssize)&&(buff[*index] !='\n')) {
-                    *index=(*index)+1;
+                if ((*index-1>=0)&&(buff[*index-1]!=' '&&buff[*index-1]!='\t'&&buff[*index-1]!='\n'))
+                {
+                    error(1,0,"%d: syntax error: ordinary token right before #",line_number);
                 }
-		
-                if (*index != ssize) {
-			// skip all \n following # and index points to the last \n
-			while(((*index+1)<ssize) &&(buff[*index+1]=='\n'))
-			{
-				if(op_s.top>0|| cmd_s.top>0){
-			//	printf("%d %d",op_s.top,cmd_s.top);
-				isReturn= true;
-				}
-				line_number++;
-				*index=*index+1;
-			}
-			if(*index<ssize-1 && buff[*index]=='\n')
-				*index=*index+1;
+                
+                //
+                while((*index<ssize)&&(buff[*index]=='#'))//skip all comments
+                {
+                    
+                    *index=*index+1;
+                    // reach the end of each comment line
+                    while ((*index<ssize)&&(buff[*index] !='\n')) {
+                        
+                        *index=(*index)+1;
+                    }
+                    if (*index != ssize) {
+                        // skip all \n following # and index points to the last \n
+                        while (buff[*index+1]==' '||buff[*index+1]=='\t')
+                            *index=*index+1;
+                        
+                        while(((*index+1)<ssize) &&((buff[*index+1]=='\n')||(buff[*index+1]==' ')||(buff[*index+1]=='\t')))
+                        {
+                            if((op_s_top>0|| cmd_s_top>0)&& buff[*index+1]=='\n'){
+                                //	printf("%d %d",op_s.top,cmd_s.top);
+                                isReturn= true;
+                            }
+                            if(buff[*index+1]=='\n')
+                                line_number++;
+                            
+                            *index=*index+1;
+                        }
+                        if(*index<ssize-1 && ((buff[*index]=='\n')||(buff[*index]==' ')||(buff[*index]=='\t')))
+                            *index=*index+1;
+                
+                        
+                        line_number++;
+                    }
+                }
+                *index=*index-1;
 
-                    line_number++;
-                }
-                }
-		*index=*index-1;
                 break;
             case ' ':
                 break;
@@ -568,9 +581,9 @@ command_t build_command_t(char* buff, int* index, size_t ssize)// size=buff--rea
             case '\n':
                 line_number++;
                 //
-                if(((op_s.top-count_left_bracket)>=cmd_s.top) &&(cmd_s.top>0))
+               /* if(((op_s.top-count_left_bracket)>=cmd_s.top) &&(cmd_s.top>0))
                     error(1, 0, "%d: syntax error 16 /n happens with dismatched operator and command", line_number);
-                // ? \n
+                */// ? \n
                 if((next<ssize)&&(buff[next]!='(') && (buff[next]!=')')&&(isSpecial(buff[next])))
                     
                     error(1, 0, "%d: syntax error 17 /n is before specials other than ( )",line_number);
@@ -671,11 +684,11 @@ command_t build_command_t(char* buff, int* index, size_t ssize)// size=buff--rea
         error(1, 0, "%d: syntax error 21-3 invalid > <", line_number);
     }
     // pop all operators and commands
-    if ((op_s.top>=cmd_s.top) &&(cmd_s.top>0))
+   /* if ((op_s.top>=cmd_s.top) &&(cmd_s.top>0))
     {
         
         error(1, 0, "%d: syntax error 21 dismatched operator and command", line_number);
-    }
+    }*/
     
     while (op_s.top>0) {
         // only ; left
