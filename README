@@ -1,12 +1,26 @@
-Group member: …, Han Wang(UID:104547543) 
+Group member: Evelyn Chen (UID:704332587), Han Wang(UID:104547543) 
 …
-we implement a build_command_t function to return a command tree to build a complete command stream. in order to check the syntax error, things are arranged as follows:
-1.for ;, we will check if ;;/<;/>;/\n; happens. And we will regard ;\n as a ;
-2. for other operators like | || &&, we will check if < or > appears right before them.
-and if \n appears before them.
-3. for ), we will check if it final meets a ) and if < or > appears before it.
-4. for < >, we will set the global variables: wait_input and wait_output as a signal. 
-And we will also check if </n or >/n happens.
-5. for \n, we will check if #operators matches with #commands, if it’s followed by specials other than ( ).
-6. when finish building, we will pop all the operators and commands and check it there’s only command left or nothing was pushed ever.
+to execute command, we implement different function with respect to simple, sequence, And, or, subshell, pipe command.
+1. simple command:
+we first deal with the input and output and get the fd.
+then, we call fork, do execvp inside child process and call wait inside parent process.
+2. and 
+first, we call fork and if this child run successfully, we will call another fork inside parent process.
+3. or
+first, we call fork and if this child run unsuccessfully, we will call another fork inside parent process.
+4. sequence
+first, we call fork and inside the parent process, we will wait the first child to exit and call another fork.
+5. subshell
+we first deal with the input and output and get the fd.
+then, we call fork, do execute_command (c->u.subshell_command) inside child process and call wait inside parent process.
+6.pipe
+we first deal with the input and output and get the fd[2].
+then, we will fork the get the first child process as the right side of pipe and do execute_command(c->u.command[1]).
+then, in the parent process, we will fork one more time the get the second child process as the left side of pipe and do execute_command(c->u.command[0]).
+at last, inside the parent process, we let these two child process to wait the other to finish.
+
+* the the whole process, we will set error signal when fd<0, dup2<0, fork fails and waitpid()<0. And we will also record parent’s status from the child’s status.
+
+
+
 
