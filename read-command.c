@@ -14,21 +14,21 @@
 #endif
 
 /* FIXME: You may need to add #include directives, macro definitions,
-   static function definitions, etc.  */
+ static function definitions, etc.  */
 
 //additional includes
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
 #include <string.h>
- 
+
 //end of additional includes
 const int  OPERATOR_LEN =8;
 const int WORD_LEN =16;
 const int INT_STACK_LEN=16;
 
 /* FIXME: Define the type 'struct command_stream' here.  This should
-   complete the incomplete type declaration in command.h.  */
+ complete the incomplete type declaration in command.h.  */
 
 //auxiliary functions declarations
 bool isWord (char c);
@@ -95,13 +95,13 @@ command_t init_command(enum command_type type)
     command->u.command[0]=NULL;
     command->u.command[1]=NULL;
     command->u.subshell_command=NULL;
-
+    
     /* put this inside build command tree
-    if(type == SUBSHELL_COMMAND)
-    {
-        command->u.subshell_command= command_t checked_malloc(sizeof(struct command));
-    }
-*/
+     if(type == SUBSHELL_COMMAND)
+     {
+     command->u.subshell_command= command_t checked_malloc(sizeof(struct command));
+     }
+     */
     return command;
 }
 
@@ -146,10 +146,10 @@ command_t store_simple_command (char *c, int *i, size_t size ) // to avoid simil
     int count_w=0;
     command->u.word=(char**)malloc(sizeof(char*)*size_word);
     
-   // store words instead of store pointers
+    // store words instead of store pointers
     for(int j=0;j<size_word;j++) // j instead of i
         command->u.word[j]=(char*)malloc(sizeof(char)*size);
- 
+    
     
     while ((*i)<size)
     {
@@ -232,7 +232,7 @@ void init_op_stack()
     {
         op_s.operator[i]=(char*)checked_malloc(OPERATOR_LEN*sizeof(char));
     }
-
+    
 }
 
 struct cmd_stack{
@@ -253,7 +253,7 @@ void init_cmd_stack(){
 void push_op(char* cc)
 {
     if (op_s.len==(op_s.top))  // get larger space
-
+        
     {
         op_s.operator=(char**) realloc(op_s.operator, op_s.len*2*sizeof(char*));
         for (int i=op_s.len; i<2*op_s.len; i++)
@@ -273,7 +273,7 @@ char* pop_op()
     if (op_s.top<=0) {
         error(1, 0, "%d: syntax error 1 operater stack invalid pop", line_number);
     }
- 
+    
     else{
         //strcpy(cc,op_s.operator[op_s.top-1]);
         char* t=op_s.operator[op_s.top-1];
@@ -287,12 +287,12 @@ char* pop_op()
 void push_cmd( command_t cc)
 {
     if (cmd_s.len==cmd_s.top) { // get larger space
-    cmd_s.command=(command_t*)realloc(cmd_s.command, 2*cmd_s.len*sizeof(command_t));// realloc store previous content
-            for (int i=cmd_s.len; i<2*cmd_s.len; i++)
+        cmd_s.command=(command_t*)realloc(cmd_s.command, 2*cmd_s.len*sizeof(command_t));// realloc store previous content
+        for (int i=cmd_s.len; i<2*cmd_s.len; i++)
             cmd_s.command[i]=(command_t) checked_malloc(sizeof(struct command));
         cmd_s.len=2*cmd_s.len;
         
-}
+    }
     cmd_s.top++;
     cmd_s.command[cmd_s.top-1]=cc; // copy store
     //debug
@@ -351,10 +351,10 @@ command_t build_command_t(char* buff, int* index, size_t ssize)// size=buff--rea
                 if (buff[i]=='\n') {
                     error(1, 0, "%d: syntax error 4 \n appears in wrong place", line_number);
                 }
-
+                
                 
                 if (op_s.top ==0)
-                push_op(";");
+                    push_op(";");
                 else{
                     
                     while ( (op_s.top>0)&&(precedence(op_s.operator[op_s.top-1])>=precedence(";")) &&(strcmp(op_s.operator[op_s.top-1],"(")!=0) )
@@ -378,7 +378,7 @@ command_t build_command_t(char* buff, int* index, size_t ssize)// size=buff--rea
             case '|':
                 if(wait_input || wait_output)
                     error(1, 0, "%d: syntax error 5-1 < > happens at wrong place", line_number);
-
+                
                 if ((next<ssize)&&buff[next]=='|')  // case: ||
                 {
                     *index=(*index)+1;
@@ -391,8 +391,8 @@ command_t build_command_t(char* buff, int* index, size_t ssize)// size=buff--rea
                         error(1, 0, "%d: syntax error 5-2 \n appears in wrong place", line_number);
                     }
                     /*if (op_s.top>=cmd_s.top) {
-                        error(1, 0, "%d: syntax error 6 dismatched operator and command",line_number);
-                    }*/
+                     error(1, 0, "%d: syntax error 6 dismatched operator and command",line_number);
+                     }*/
                     
                     if (op_s. top==0)
                         push_op("||");
@@ -433,12 +433,12 @@ command_t build_command_t(char* buff, int* index, size_t ssize)// size=buff--rea
                     if (buff[*index+1]=='\n') {
                         line_number++;
                     }
-
+                    
                     *index=*index+1;
                 }
-               
+                
                 break;
-           case '&':
+            case '&':
                 if(wait_input || wait_output)
                     error(1, 0, "%d: syntax error 9 < > happens at wrong place", line_number);
                 
@@ -446,8 +446,8 @@ command_t build_command_t(char* buff, int* index, size_t ssize)// size=buff--rea
                 {
                     *index=(*index)+1;
                     /*if (op_s.top>=cmd_s.top) {
-                        error(1, 0, "%d: syntax error 9  dismatched operator and command",line_number);
-                    }*/
+                     error(1, 0, "%d: syntax error 9  dismatched operator and command",line_number);
+                     }*/
                     //valid
                     if (op_s.top ==0)
                         push_op( "&&");
@@ -476,31 +476,34 @@ command_t build_command_t(char* buff, int* index, size_t ssize)// size=buff--rea
                 }
                 break;
                 
-           case ')':
+            case ')':
                 /*if (op_s.top>=cmd_s.top)
-                    error(1, 0, "%d: syntax error 11  dismatched operator and command",line_number);*/
-                 if(wait_input || wait_output)
-                 error(1, 0, "%d: syntax error 11-1 < or > happens at wrong place", line_number);
+                 error(1, 0, "%d: syntax error 11  dismatched operator and command",line_number);*/
+                if(wait_input || wait_output)
+                    error(1, 0, "%d: syntax error 11-1 < or > happens at wrong place", line_number);
+                
+                
+                while ((op_s.top>=1)&&(strcmp(op_s.operator[op_s.top-1],"(")!=0))
+                {
+                    char* tmp_op4=pop_op();
+                    command_t tmp4=init_command(cmd_type(tmp_op4));
+                    tmp4->u.command[1]=pop_cmd( );
+                    tmp4->u.command[0]=pop_cmd( );
+                    push_cmd( tmp4);
+                }
+                
+                if ((strcmp(op_s.operator[0],"(")) &&(op_s.top==0)) {
+                    error(1, 0, "%d: syntax error 11-2 \n appears in wrong place", line_number);
+                
+}
+		pop_op();
 
-                
-                    while ((op_s.top>=1)&&(strcmp(op_s.operator[op_s.top-1],"(")!=0))
-                    {
-                        char* tmp_op4=pop_op();
-                        command_t tmp4=init_command(cmd_type(tmp_op4));
-                        tmp4->u.command[1]=pop_cmd( );
-                        tmp4->u.command[0]=pop_cmd( );
-                        push_cmd( tmp4);
-                    }
-                
-                    if ((strcmp(op_s.operator[0],"(")) &&(op_s.top==0)) {
-                        error(1, 0, "%d: syntax error 11-2 \n appears in wrong place", line_number);
-                    }
                 count_left_bracket--;
-                    // (  )
-                    command_t tmp3=init_command(SUBSHELL_COMMAND);
-                    tmp3->u.subshell_command= (command_t) checked_malloc(sizeof(struct command));
-                    tmp3->u.subshell_command=pop_cmd();
-                    push_cmd( tmp3);
+                // (  )
+                command_t tmp3=init_command(SUBSHELL_COMMAND);
+                tmp3->u.subshell_command= (command_t) checked_malloc(sizeof(struct command));
+                tmp3->u.subshell_command=pop_cmd();
+                push_cmd( tmp3);
                 
                 break;
             case '<':
@@ -518,7 +521,7 @@ command_t build_command_t(char* buff, int* index, size_t ssize)// size=buff--rea
                 
             case '>':
                 if((op_s.top-count_left_bracket)>=cmd_s.top)
-                error(1, 0, "%d: syntax error 14 dismatched operator and command",line_number);
+                    error(1, 0, "%d: syntax error 14 dismatched operator and command",line_number);
                 
                 if((next<ssize)&&buff[next]=='\n')
                     error(1, 0, "%d: syntax error 15-1 > followed by newline ", line_number);
@@ -528,34 +531,46 @@ command_t build_command_t(char* buff, int* index, size_t ssize)// size=buff--rea
                 //push_cmd(tmp);
                 wait_output=true;
                 break;
-
+                
             case '#': // skip comments
-                *index=(*index)+1;
+              
+		while((*index<ssize)&&(buff[*index]=='#'))//skip all comments
+{
+		*index=*index+1;
+		// reach the end of each comment line
                 while ((*index<ssize)&&(buff[*index] !='\n')) {
                     *index=(*index)+1;
                 }
+		
                 if (*index != ssize) {
+			// skip all \n following # and index points to the last \n
+			while(((*index+1)<ssize) &&(buff[*index+1]=='\n'))
+			{
+				isReturn= true;
+				line_number++;
+				*index=*index+1;
+			}
                     line_number++;
                 }
-                
+                }
                 break;
             case ' ':
-                       break;
+                break;
             case '\t':
-                    break;
+                break;
             case '\n':
-                 line_number++;
+                line_number++;
                 //
                 if(((op_s.top-count_left_bracket)>=cmd_s.top) &&(cmd_s.top>0))
                     error(1, 0, "%d: syntax error 16 /n happens with dismatched operator and command", line_number);
-                    // ? \n
+                // ? \n
                 if((next<ssize)&&(buff[next]!='(') && (buff[next]!=')')&&(isSpecial(buff[next])))
                     
                     error(1, 0, "%d: syntax error 17 /n is before specials other than ( )",line_number);
                 
                 // regard as ; a /n b
                 if (buff[*index-1]!='\n' && (buff[*index +1]!='\n') &&(*index-1>=0)&&(*index+1<ssize)) {
-    
+                    
                     
                     if (op_s.top ==0)
                         push_op(";");
@@ -575,60 +590,71 @@ command_t build_command_t(char* buff, int* index, size_t ssize)// size=buff--rea
                     }
                 }
                 // \n \n as a break return a tree
-                if ((next<ssize)&&buff[next]=='\n') {
+                while((*index+1<ssize)&&(buff[*index+1]==' '|| buff[*index+1]=='\t'))
+			*index=*index+1;
+
+                if ((*index+1<ssize)&&(buff[*index+1]=='\n' || buff[*index+1]=='#')) {
                     // skip all the \n
-                    while(((buff[(*index)+1]=='\n')||(buff[*index+1]=='\t')||(buff[*index+1]==' '))&& (*index<ssize -1))
+                    while(((buff[(*index)+1]=='\n')||(buff[*index+1]=='#')||(buff[*index+1]=='\t')||(buff[*index+1]==' '))&& (*index<ssize -1))
                     {
                         if (buff[(*index)+1]=='\n')
                             line_number++;
+			else if(buff[*index+1]=='#')	
+			{
+			while((*index+1<ssize)&&(buff[*index+1]!='\n'))
+				{
+				*index=*index+1;
+				}
+			line_number++;
+			}
                         *index=*index+1;
                     }
                     
                     // return a tree
                     isReturn=true;
                 }
-
-                       break;
+                
+                break;
             default: // simple command
-                       //check valid input
-                       if(isNotValid(buff[*index]))
-                       error(1, 0, "%d: syntax error 19 invalid input", line_number);
-                       if (wait_input && wait_output)
-                           error (1, 0, "%d: syntax error 20 input output dismatch", line_number);
+                //check valid input
+                if(isNotValid(buff[*index]))
+                    error(1, 0, "%d: syntax error 19 invalid input", line_number);
+                if (wait_input && wait_output)
+                    error (1, 0, "%d: syntax error 20 input output dismatch", line_number);
                 //
-                       if(wait_input)
-                       {
-                           //*index=(*index)+1;
-                           char* text= get_next_word(buff, index, ssize);
-                           if (text==NULL|| strlen(text)==0) {
-                               error(1, 0, "%d: syntax error 21-1 invalid <", line_number);
-                           }
-                           int len = sizeof(text)/sizeof(char);
-                           cmd_s.command[cmd_s.top-1]->input = (char*) checked_malloc(sizeof(char)*len);
-                           strcpy(cmd_s.command[cmd_s.top-1]->input, text); // undefined text
-                           *index=*index-1;//to get back one step since there's a ++ at the end
-                           wait_input=false;
-                           break;
-                       }
-                       if(wait_output)
-                       {
-                           //*index=(*index)+1;
-                           char* text= get_next_word(buff, index, ssize);
-                           if (text==NULL || strlen(text)==0) {
-                               error(1, 0, "%d: syntax error 21-2 invalid >", line_number);
-                           }
-                           int len = sizeof(text)/sizeof(char);
-                           cmd_s.command[cmd_s.top-1]->output = (char*) checked_malloc(sizeof(char)*len);
-                           strcpy(cmd_s.command[cmd_s.top-1]->output, text); // undefined text
-                           *index=*index-1;//
-                           wait_output =false;
-                           break;
-                       }
+                if(wait_input)
+                {
+                    //*index=(*index)+1;
+                    char* text= get_next_word(buff, index, ssize);
+                    if (text==NULL|| strlen(text)==0) {
+                        error(1, 0, "%d: syntax error 21-1 invalid <", line_number);
+                    }
+                    int len = sizeof(text)/sizeof(char);
+                    cmd_s.command[cmd_s.top-1]->input = (char*) checked_malloc(sizeof(char)*len);
+                    strcpy(cmd_s.command[cmd_s.top-1]->input, text); // undefined text
+                    *index=*index-1;//to get back one step since there's a ++ at the end
+                    wait_input=false;
+                    break;
+                }
+                if(wait_output)
+                {
+                    //*index=(*index)+1;
+                    char* text= get_next_word(buff, index, ssize);
+                    if (text==NULL || strlen(text)==0) {
+                        error(1, 0, "%d: syntax error 21-2 invalid >", line_number);
+                    }
+                    int len = sizeof(text)/sizeof(char);
+                    cmd_s.command[cmd_s.top-1]->output = (char*) checked_malloc(sizeof(char)*len);
+                    strcpy(cmd_s.command[cmd_s.top-1]->output, text); // undefined text
+                    *index=*index-1;//
+                    wait_output =false;
+                    break;
+                }
                 // simple command
-                       //*index=(*index)+1;
-                       command_t tmp1=store_simple_command(buff, index, ssize);// things needed
-                       push_cmd(tmp1);
-                       break;
+                //*index=(*index)+1;
+                command_t tmp1=store_simple_command(buff, index, ssize);// things needed
+                push_cmd(tmp1);
+                break;
         }
         (*index)=(*index)+1;
     }
@@ -642,9 +668,9 @@ command_t build_command_t(char* buff, int* index, size_t ssize)// size=buff--rea
         
         error(1, 0, "%d: syntax error 21 dismatched operator and command", line_number);
     }
-
+    
     while (op_s.top>0) {
-         // only ; left
+        // only ; left
         if(op_s.top==1 && (strcmp(op_s.operator[0],";")==0)&&(cmd_s.top==1))
             return cmd_s.command[0];
         
@@ -666,7 +692,7 @@ command_t build_command_t(char* buff, int* index, size_t ssize)// size=buff--rea
 }
 command_stream_t
 make_command_stream (int (*get_next_byte) (void *),
-		     void *get_next_byte_argument)
+                     void *get_next_byte_argument)
 {
     size_t buf_size=2048;
     size_t read_size=0;
@@ -685,40 +711,47 @@ make_command_stream (int (*get_next_byte) (void *),
     }
     
     command_stream_t stream=init_stream();
-    struct command_node* tmp_node= (struct command_node*) checked_malloc(sizeof(struct command_node));
+    stream->head= (struct command_node*) checked_malloc(sizeof(struct command_node));
     command_t tmp=NULL;
     int index=0 ;
-    tmp_node->c=build_command_t(buf,&index,read_size );
-    tmp_node->next=NULL;
+    stream->head->c=build_command_t(buf,&index,read_size );
+    stream->head->next=NULL;
     
-    stream->head=tmp_node;
-    stream->cursor=tmp_node;
-    stream->tail=tmp_node;
+    
+    stream->cursor= stream->head;
+    stream->tail= stream->head;
     tmp=build_command_t(buf, &index, read_size);
     while(tmp!=NULL){
+/*	if(tmp==NULL)
+		{
+		if(index==read_size-1)
+		break;
+		tmp=build_command_t(buf,&index,read_size);
+		continue;
+		}*/
         stream->cursor->next =(struct command_node*) checked_malloc(sizeof(struct command_node));
-        tmp_node->c  = tmp;
-        tmp_node->next = NULL;
-        // space alloc???
-        stream->cursor->next = tmp_node;
-        stream->cursor= stream->cursor->next;
+        
+        stream->cursor->next->c=tmp;
+        stream->cursor->next->next=NULL;
+        stream->cursor=stream->cursor->next;
+        
         tmp=build_command_t(buf, &index, read_size);
     }
     stream->tail=stream->cursor;
     stream->cursor=stream->head;
-          
-          
+    
+    
     return stream;
     
-  /* FIXME: Replace this with your implementation.  You may need to
+    /* FIXME: Replace this with your implementation.  You may need to
      add auxiliary functions and otherwise modify the source code.
      You can also use external functions defined in the GNU C Library.  */
     
     
-  //error (1, 0, "command reading not yet implemented");
-  //return 0;
+    //error (1, 0, "command reading not yet implemented");
+    //return 0;
 }
-    
+
 command_t
 read_command_stream (command_stream_t s)
 {
@@ -729,5 +762,5 @@ read_command_stream (command_stream_t s)
     command_t tmp=s->cursor->c;
     s->cursor=s->cursor->next;
     return tmp;
-
+    //return NULL;
 }
