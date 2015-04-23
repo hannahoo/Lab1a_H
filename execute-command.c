@@ -75,21 +75,21 @@ execute_command (command_t c, bool time_travel)
 
 void execute_simple(command_t c)// c->word
 {
-    int p=fork();
-    
+ 
     int fd[2]={-1,-1};
     if (c->input != NULL)
     {
-        fd[0] = open(c->input, O_RDONLY,644);//set for permission? like 644
+        fd[0] = open(c->input, O_RDONLY,0777);//set for permission? like 644
         if (fd[0] < 0)// 0 1 2
-            error(1, 0, "can't open input file");
+            error(1, 0, "can't open input file simple");
     }
     if (c->output != NULL)
     {
-        fd[1] = open(c->output, O_WRONLY | O_CREAT | O_TRUNC,644);
+        fd[1] = open(c->output, O_WRONLY | O_CREAT | O_TRUNC,0644);
         if (fd[1] < 0)
-            error(1, 0, "can't open output file");
+            error(1, 0, "can't open output file simple");
     }
+    int p=fork();
     if(p<0)
         error(1,0,"fork failed: simple");
     if(p==0)// child process
@@ -117,13 +117,14 @@ void execute_simple(command_t c)// c->word
         if(waitpid(p,&status,0)<0)// 0: blocking wait father process call wait
             error(1,0 ,"waited process error simple");
         c->status=WEXITSTATUS(status);
-        
+        }
+
         if(fd[0]>=0)
             close(fd[0]);
         if(fd[1]>=0)
             close(fd[1]);
         // c->status=exit_status;
-    }
+  
     
 }
 // which order?
@@ -244,7 +245,7 @@ void execute_sequence(command_t c) // wait for child to exit
 }
 void execute_subshell(command_t c)// c->subshell_command->(word,command[2])
 {
-    int p=fork();
+    
     int fd[2]={-1,-1};
     if(c->input!=NULL)
     {
@@ -258,7 +259,7 @@ void execute_subshell(command_t c)// c->subshell_command->(word,command[2])
         if(fd[1] <0)
             error(1,0,"can not open output file!");
     }
-    
+    int p=fork();
     if(p<0)
         error(1,0,"fork failed subshell");
     
