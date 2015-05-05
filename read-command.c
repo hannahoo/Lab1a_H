@@ -820,7 +820,7 @@ char ** write_list[10]={0};
 int read_list_index;
 int write_list_index;
 
-int command_t_no=0;// set the number of command tree
+int command_t_no=1;// set the number of command tree
 // read_list : a char ** for each tree
 bool haveDependency(list_node_t A,list_node_t B)
 {
@@ -871,31 +871,46 @@ list_stream_t init_list_stream()
 }
 // initial graphnode
 graph_node_t init_graph_node(command_t cmd){
-    command=cmd;
-    pid=-1;
-    size_before_list=0;
-    graph_node ** before =(graph_node**)checked_malloc(sizeof(struct graph_node*)*MAX_BEFORE);
+    graph_node_t g=(struct graph_node_t) checked_malloc(sizeof(struct graph_node));
+    
+    g->command=cmd;
+    g->pid=-1;
+    g->size_before_list=0;
+    g->before =(graph_node**)checked_malloc(sizeof(struct graph_node*)*MAX_BEFORE);
+    return g;
 }
 // initial list node
-list_node_t init_list_node(graph_node_t node){
-    graph_n=node;
-    next=NULL;
-    read_list=(char**)checked_malloc(sizeof(char*)*100);//
-    write_list=(char**)checked_malloc(sizeof(char*)*100);//
+list_node_t init_list_node(graph_node_t node)
+{
+    list_node_t l= (struct list_node_t) checked_malloc(sizeof(struct list_node));
+    l->graph_node=node;
+    l->next=NULL;
+    l->read_list=(char**)checked_malloc(sizeof(char*)*100);//
+    l->write_list=(char**)checked_malloc(sizeof(char*)*100);//
+    return l;
 
 }
 queue* init_queue()
 {
-    struct queue *Q=(queue* )checked_malloc(sizeof(queue));
+    struct queue *Q=(struct queue* )checked_malloc(sizeof( struct queue));
     Q->head=NULL;
     Q->cursor=NULL;
     Q->tail=NULL;
+    return Q;
 }
 queue_node* init_queue_node()
 {
-    struct queue_node* q=queue_node* checked_malloc(sizeof(queue_node));
+    struct queue_node* q=(struct queue_node*) checked_malloc(sizeof(struct queue_node));
     q->g=NULL;
-    Q->next=NULL;
+    q->next=NULL;
+    return q;
+}
+dependency_t init_dependency_graph()
+{
+    dependency_t d = (struct dependency_t) checked_malloc(sizeof(struct dependency_graph));
+    d->no_dependency=init_queue();
+    d->dependency=init_queue();
+    return d;
 }
 
 
@@ -914,31 +929,35 @@ do{
         else
             add k to dependencies;	
 }*/
-//!!!!!!!!!!!!!
+//
 
 dependency_t create_graph(command_stream_t s)
 {
     command_t command;
     list_stream_t stream= init_list_stream();
-    dependency_t d;//temporarily. not correct.
-    d->no_dependency=init_queue();
-    d->dependency=init_queue();
+    
+    // initial dependency graph
+    dependency_t d = init_dependency_graph();
     
     while ((command = read_command_stream (s)))//for each command tree
     {
         int index_r=0;
         int index_w=0;
+        
         //
         //create a new GraphNode to store command tree k;
         graph_node_t node=init_graph_node(command);
         
         //create a ListNode with graphnode, wl, rl;
         
-        if (command_t_no==0) {
+        if (command_t_no==1) {
             stream->head=init_list_node( node);
             stream->cursor=stream->head;
         }
-        else stream->cursor=init_list_node(node);
+        else {
+            stream->cursor->next=init_list_node(node);
+            stream->cursor=stream->cursor->next;
+        }
         
         //1. generate RL, WL for command tree
         process_command( stream->cursor, &index_r, &index_w);//save the rl and wl inside
@@ -996,6 +1015,13 @@ dependency_t create_graph(command_stream_t s)
         
         
     }
+    // set tail and cursor
+    d->no_dependency->tail=d->no_dependency->cursor;
+    d->no_dependency->cursor=d->no_dependency->head;
+    d->dependency->tail=d->dependency->cursor;
+    d->dependency->cursor=d->dependency->head;
+    stream->tail=stream->cursor;
+    stream->cursor=stream->head;
         return d;//
 }
 //build RL WL for each tree
