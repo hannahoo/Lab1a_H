@@ -379,14 +379,14 @@ command_t build_command_t(char* buff, int* index, size_t ssize)// size=buff--rea
             case '|':
                 if(wait_input || wait_output)
                     error(1, 0, "%d: syntax error 5-1 < > happens at wrong place", line_number);
-              // check if /n operator
-              int check=*index-1;
-		while((check>=0) &&(( buff[check]==' ')||(buff[check]=='\t')||(buff[check]=='\n'))){
-		if(buff[check]=='\n')
-		error(1,0,"%d%c%c: syntax error 5-2 \n happends before operator |",line_number,buff[check],buff[check+1]);
-		check--;
-	//	printf("%d : %c\n",line_number,buff[check]);	
-	} 
+                // check if /n operator
+                int check=*index-1;
+                while((check>=0) &&(( buff[check]==' ')||(buff[check]=='\t')||(buff[check]=='\n'))){
+                    if(buff[check]=='\n')
+                        error(1,0,"%d%c%c: syntax error 5-2 \n happends before operator |",line_number,buff[check],buff[check+1]);
+                    check--;
+                    //	printf("%d : %c\n",line_number,buff[check]);
+                }
                 if ((next<ssize)&&buff[next]=='|')  // case: ||
                 {
                     *index=(*index)+1;
@@ -399,8 +399,8 @@ command_t build_command_t(char* buff, int* index, size_t ssize)// size=buff--rea
                         error(1, 0, "%d: syntax error 5-2 \n appears in wrong place", line_number);
                     }
                     if (op_s.top-count_left_bracket>=cmd_s.top) {
-                     error(1, 0, "%d: syntax error 6 dismatched operator and command",line_number);
-                     }
+                        error(1, 0, "%d: syntax error 6 dismatched operator and command",line_number);
+                    }
                     
                     if (op_s. top==0)
                         push_op("||");
@@ -450,18 +450,18 @@ command_t build_command_t(char* buff, int* index, size_t ssize)// size=buff--rea
                 if(wait_input || wait_output)
                     error(1, 0, "%d: syntax error 9 < > happens at wrong place", line_number);
                 check=*index-1;
-		while((check>=0) &&((buff[check]==' ')||( buff[check]=='\n')||(buff[check]=='\t')))
-		{
-		if(buff[check]=='\n')
-			error(1,0, "syntax error 9-2 \n happens before &");
-		check--;
-		}
+                while((check>=0) &&((buff[check]==' ')||( buff[check]=='\n')||(buff[check]=='\t')))
+                {
+                    if(buff[check]=='\n')
+                        error(1,0, "syntax error 9-2 \n happens before &");
+                    check--;
+                }
                 if((next<ssize)&&buff[next]=='&')
                 {
                     *index=(*index)+1;
                     if (op_s.top-count_left_bracket>=cmd_s.top) {
-                     error(1, 0, "%d: syntax error 9  dismatched operator and command",line_number);
-                     }
+                        error(1, 0, "%d: syntax error 9  dismatched operator and command",line_number);
+                    }
                     //valid
                     if (op_s.top ==0)
                         push_op( "&&");
@@ -508,10 +508,10 @@ command_t build_command_t(char* buff, int* index, size_t ssize)// size=buff--rea
                 
                 if ((strcmp(op_s.operator[0],"(")) &&(op_s.top==0)) {
                     error(1, 0, "%d: syntax error 11-2 \n appears in wrong place", line_number);
+                    
+                }
+                pop_op();
                 
-}
-		pop_op();
-
                 count_left_bracket--;
                 // (  )
                 command_t tmp3=init_command(SUBSHELL_COMMAND);
@@ -528,7 +528,7 @@ command_t build_command_t(char* buff, int* index, size_t ssize)// size=buff--rea
                     error(1, 0, "%d: syntax error 13-1 < followed by newline ", line_number);
                 if(wait_input || wait_output)
                     error(1, 0, "%d: syntax error 13-2 < happens at wrong place", line_number);
-
+                
                 wait_input=true;
                 break;
                 
@@ -546,7 +546,7 @@ command_t build_command_t(char* buff, int* index, size_t ssize)// size=buff--rea
                 break;
                 
             case '#': // skip comments
-              
+                
                 if ((*index-1>=0)&&(buff[*index-1]!=' '&&buff[*index-1]!='\t'&&buff[*index-1]!='\n'))
                 {
                     error(1,0,"%d: syntax error: ordinary token right before #",line_number);
@@ -579,18 +579,18 @@ command_t build_command_t(char* buff, int* index, size_t ssize)// size=buff--rea
                             
                             *index=*index+1;
                         }
-			if(((op_s.top>0)||(cmd_s.top>0))&&(comments>1))
-			isReturn = true;
-
+                        if(((op_s.top>0)||(cmd_s.top>0))&&(comments>1))
+                            isReturn = true;
+                        
                         if(*index<ssize-1 && ((buff[*index]=='\n')||(buff[*index]==' ')||(buff[*index]=='\t')))
                             *index=*index+1;
-                
+                        
                         
                         line_number++;
                     }
                 }
                 *index=*index-1;
-
+                
                 break;
             case ' ':
                 break;
@@ -599,9 +599,9 @@ command_t build_command_t(char* buff, int* index, size_t ssize)// size=buff--rea
             case '\n':
                 line_number++;
                 //
-               /* if(((op_s.top-count_left_bracket)>=cmd_s.top) &&(cmd_s.top>0))
-                    error(1, 0, "%d: syntax error 16 /n happens with dismatched operator and command", line_number);
-                */// ? \n
+                /* if(((op_s.top-count_left_bracket)>=cmd_s.top) &&(cmd_s.top>0))
+                 error(1, 0, "%d: syntax error 16 /n happens with dismatched operator and command", line_number);
+                 */// ? \n
                 if((next<ssize)&&(buff[next]!='(') && (buff[next]!=')')&&(isSpecial(buff[next])))
                     
                     error(1, 0, "%d: syntax error 17 /n is before specials other than ( )",line_number);
@@ -611,11 +611,11 @@ command_t build_command_t(char* buff, int* index, size_t ssize)// size=buff--rea
                     
                     
                     if (op_s.top ==0)
-                       {
-			 push_op(";");
-			if(cmd_s.top<=0)
-			error(1,0, "syntax error: 17-2 /n appear at wrong place");
-			}
+                    {
+                        push_op(";");
+                        if(cmd_s.top<=0)
+                            error(1,0, "syntax error: 17-2 /n appear at wrong place");
+                    }
                     else{
                         
                         while ((op_s.top>0)&& (precedence(op_s.operator[op_s.top-1])>=precedence(";")) &&(strcmp(op_s.operator[op_s.top-1],"(")!=0) )
@@ -633,28 +633,28 @@ command_t build_command_t(char* buff, int* index, size_t ssize)// size=buff--rea
                 }
                 // \n \n as a break return a tree
                 while((*index+1<ssize)&&(buff[*index+1]==' '|| buff[*index+1]=='\t'))
-			*index=*index+1;
-
+                    *index=*index+1;
+                
                 if ((*index+1<ssize)&&(buff[*index+1]=='\n' || buff[*index+1]=='#')) {
                     // skip all the \n
                     while(((buff[(*index)+1]=='\n')||(buff[*index+1]=='#')||(buff[*index+1]=='\t')||(buff[*index+1]==' '))&& (*index<ssize -1))
                     {
                         if (buff[(*index)+1]=='\n')
                             line_number++;
-			else if(buff[*index+1]=='#')	
-			{
-			while((*index+1<ssize)&&(buff[*index+1]!='\n'))
-				{
-				*index=*index+1;
-				}
-			line_number++;
-			}
+                        else if(buff[*index+1]=='#')
+                        {
+                            while((*index+1<ssize)&&(buff[*index+1]!='\n'))
+                            {
+                                *index=*index+1;
+                            }
+                            line_number++;
+                        }
                         *index=*index+1;
                     }
                     
                     // return a tree
                     if(op_s.top>0 || cmd_s.top>0)
-                    isReturn=true;
+                        isReturn=true;
                 }
                 
                 break;
@@ -706,11 +706,11 @@ command_t build_command_t(char* buff, int* index, size_t ssize)// size=buff--rea
         error(1, 0, "%d: syntax error 21-3 invalid > <", line_number);
     }
     // pop all operators and commands
-   /* if ((op_s.top>=cmd_s.top) &&(cmd_s.top>0))
-    {
-        
-        error(1, 0, "%d: syntax error 21 dismatched operator and command", line_number);
-    }*/
+    /* if ((op_s.top>=cmd_s.top) &&(cmd_s.top>0))
+     {
+     
+     error(1, 0, "%d: syntax error 21 dismatched operator and command", line_number);
+     }*/
     
     while (op_s.top>0) {
         // only ; left
@@ -765,7 +765,7 @@ make_command_stream (int (*get_next_byte) (void *),
     stream->tail= stream->head;
     tmp=build_command_t(buf, &index, read_size);
     while(tmp!=NULL){
-
+        
         stream->cursor->next =(struct command_node*) checked_malloc(sizeof(struct command_node));
         
         stream->cursor->next->c=tmp;
@@ -811,7 +811,7 @@ read_command_stream (command_stream_t s)
 //dependency_graph create_graph(command_stream_t c_stream){}
 //void process_command(command_t c){}
 
-void process_command(command_t cmd);
+void process_command (list_node_t node,command_t cmd, int *index_r, int * index_w);
 bool haveDependency(command_t A, command_t B);
 
 //need fix: each tree has separate read/write list
@@ -888,7 +888,7 @@ list_node_t init_list_node(graph_node_t node)
     l->read_list=(char**)checked_malloc(sizeof(char*)*100);//
     l->write_list=(char**)checked_malloc(sizeof(char*)*100);//
     return l;
-
+    
 }
 queue* init_queue()
 {
@@ -916,19 +916,19 @@ dependency_t init_dependency_graph()
 
 // build the dependency graph
 /*for each command tree k in command stream
-do{
-    //determine if there is dependency between command trees before it and itself.
+ do{
+ //determine if there is dependency between command trees before it and itself.
  
-    processCommand(k->command);//given root node, generate the read&write list
-    for i=1:k-1
-        if(haveDependency(i,k))
-        update k's before list;
-        //check the before list
-        if before==NULL
-        add k to no_dependencies;
-        else
-            add k to dependencies;	
-}*/
+ processCommand(k->command);//given root node, generate the read&write list
+ for i=1:k-1
+ if(haveDependency(i,k))
+ update k's before list;
+ //check the before list
+ if before==NULL
+ add k to no_dependencies;
+ else
+ add k to dependencies;
+ }*/
 //
 
 dependency_t create_graph(command_stream_t s)
@@ -960,7 +960,7 @@ dependency_t create_graph(command_stream_t s)
         }
         
         //1. generate RL, WL for command tree
-        process_command( stream->cursor, &index_r, &index_w);//save the rl and wl inside
+        process_command( stream->cursor, stream->cursor->command, &index_r, &index_w);//save the rl and wl inside
         
         stream->cursor->read_list[index_r]=NULL;
         stream->cursor->write_list[index_w]=NULL;
@@ -1022,16 +1022,16 @@ dependency_t create_graph(command_stream_t s)
     d->dependency->cursor=d->dependency->head;
     stream->tail=stream->cursor;
     stream->cursor=stream->head;
-        return d;//
+    return d;//
 }
 //build RL WL for each tree
-void process_command(list_node_t node, int *index_r, int * index_w)
+void process_command(list_node_t node,command_t cmd, int *index_r, int * index_w)
 {
-    if (node->command->type==SIMPLE_COMMAND)
+    if (cmd->type==SIMPLE_COMMAND)
     {
-        if (node->command->input!=NULL) {
+        if (cmd->input!=NULL) {
             node->read_list[*index_r]=(char*) checked_malloc(sizeof(char)*100);
-            strcpy(node->read_list[*index_r], node->command->input);
+            strcpy(node->read_list[*index_r], cmd->input);
             *index_r++;
         }
         
@@ -1039,11 +1039,11 @@ void process_command(list_node_t node, int *index_r, int * index_w)
         //ignore options (starting with dash - )
         
         int i=1; //store from word[1]
-        while (node->command->u.word[i]!=NULL)
+        while (cmd->u.word[i]!=NULL)
         {
-            if (node->command->u.word[i][0]!='-') {
+            if (cmd->u.word[i][0]!='-') {
                 node->read_list[*index_r]=(char*)checked_malloc(sizeof(char)*100);
-                strcpy(node->read_list[*index_r],node->command->u.word[i]);
+                strcpy(node->read_list[*index_r], cmd->u.word[i]);
                 *index_r++;
             }
             i++;
@@ -1051,33 +1051,33 @@ void process_command(list_node_t node, int *index_r, int * index_w)
         // write list
         if (node->command->output!=NULL) {
             node->write_list[*index_w]=(char*) checked_malloc(sizeof(char)*100);
-            strcpy(node->write_list[*index_w], node->command->output);
+            strcpy(node->write_list[*index_w], cmd->output);
             *index_w++;
         }
     }
     
-    else if (node->command->type==SUBSHELL_COMMAND)
+    else if (cmd->type==SUBSHELL_COMMAND)
     {
         
-        if (node->command->input!=NULL) {
+        if (cmd->input!=NULL) {
             node->read_list[*index_r]=(char*) checked_malloc(sizeof(char)*100);
-            strcpy(node->read_list[*index_r], node->command->input);
+            strcpy(node->read_list[*index_r], cmd->input);
             *index_r++;
         }
-
-                // write list
-        if (node->command->output!=NULL) {
+        
+        // write list
+        if (cmd->output!=NULL) {
             node->write_list[*index_w]=(char*) checked_malloc(sizeof(char)*100);
-            strcpy(node->write_list[*index_w], node->command->output);
+            strcpy(node->write_list[*index_w], cmd->output);
             *index_w++;
         }
         
-        process_command(node->command->u.subshell_command, index_r, index_w);
+        process_command(cmd->u.subshell_command, index_r, index_w);
     }
     else
     {
-        process_command(node->command->u.command[0], index_r, index_w);
-        process_command(node->command->u.command[1], index_r, index_w);
+        process_command(node,cmd->u.command[0], index_r, index_w);
+        process_command(node,cmd->u.command[1], index_r, index_w);
         
     }
 }
