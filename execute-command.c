@@ -358,7 +358,7 @@ int execute_graph(dependency_t dependency_graph)
 {
     execute_no_dependency(dependency_graph->no_dependency);
     
-    int final_status=execute_dependency(dependency_graph->depedency);
+    int final_status=execute_dependency(dependency_graph->dependency);
     return final_status;///
 }
 
