@@ -884,6 +884,19 @@ list_node_t init_list_node(graph_node_t node){
     write_list=(char**)checked_malloc(sizeof(char*)*100);//
 
 }
+queue* init_queue()
+{
+    struct queue *Q=(queue* )checked_malloc(sizeof(queue));
+    Q->head=NULL;
+    Q->cursor=NULL;
+    Q->tail=NULL;
+}
+queue_node* init_queue_node()
+{
+    struct queue_node* q=queue_node* checked_malloc(sizeof(queue_node));
+    q->g=NULL;
+    Q->next=NULL;
+}
 
 
 // build the dependency graph
@@ -907,7 +920,9 @@ dependency_t create_graph(command_stream_t s)
 {
     command_t command;
     list_stream_t stream= init_list_stream();
-    
+    dependency_t d;//temporarily. not correct.
+    d->no_dependency=init_queue();
+    d->dependency=init_queue();
     
     while ((command = read_command_stream (s)))//for each command tree
     {
@@ -949,19 +964,39 @@ dependency_t create_graph(command_stream_t s)
         }
         //3.check if before list is NULL, then update the dependency graph
         if (stream->cursor->graph_node->size_before_list==0) {
-            // implement of queue!!!!!!!!!
-            d->no_dependency = insert(stream->cursor->graph_node);
+            
+            if (d->no_dependency->head==NULL) {
+                d->no_dependency->head = init_queue_node();
+                d->no_dependency->head->g=stream->cursor->graph_node;
+                d->no_dependency->cursor=head;
+            }
+            else
+            {
+                d->no_dependency->cursor->next = init_queue_node();
+                d->no_dependency->cursor->next->g= stream->cursor->graph_node;
+                d->no_dependency->cursor =d->no_dependency->cursor->next;
+            }
+            
         }
         else{
-            // same!!!!!!
-            d->dependency = insert(stream->cursor->graph_node);
+            
+            if (d->dependency->head==NULL) {
+                d->dependency->head = init_queue_node();
+                d->dependency->head->g=stream->cursor->graph_node;
+                d->dependency->cursor=head;
+            }
+            else
+            {
+                d->dependency->cursor->next = init_queue_node();
+                d->dependency->cursor->next->g= stream->cursor->graph_node;
+                d->dependency->cursor =d->dependency->cursor->next;
+            }
         }
         command_t_no++;
         
         
     }
-    dependency_t d;//temporarily. not correct.
-    return d;//
+        return d;//
 }
 //build RL WL for each tree
 void process_command(list_node_t node, int *index_r, int * index_w)
