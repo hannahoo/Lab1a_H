@@ -408,7 +408,7 @@ void execute_no_dependency(queue_t no_dependency)
 
 int execute_dependency(queue_t dependency)
 {
-    int status;
+    int status=-1;
     queue_node_t queue_node_cursor=dependency->head;
     // for each node in queue
     while (queue_node_cursor != NULL)
