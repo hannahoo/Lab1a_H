@@ -79,3 +79,51 @@ struct command_stream
     struct command_node* tail;
     struct command_node* cursor;
 };
+/*********time travel structs*****/
+
+struct graph_node
+{
+    command_t command;
+    struct graph_node** before;
+    pid_t pid;
+    //
+    int size_before_list;//
+    
+};
+
+struct queue_node
+{
+    struct graph_node *g;
+    struct queue_node *next;
+};
+
+struct queue //linked list of queue node
+{
+    struct queue_node* head;
+    struct queue_node* tail;
+};
+
+//create a list node {graph node, RL, WL}? where should i put RL, WL?
+
+struct dependency_graph
+{
+    //need to implement a queue ourself first . linked list of graph node
+    
+    struct queue* no_dependency;
+    struct queue* depedency;
+};
+
+// linked list to save wl rl
+struct list_node{ // to save graphnode wl rl for each command tree
+    
+    struct graph_node *graph_node;
+    char ** read_list;
+    char ** write_list;
+    struct list_node* next;
+    
+};
+struct list_stream{
+    struct list_node* head;
+    struct list_node* cursor;
+    struct list_node* tail;
+};
