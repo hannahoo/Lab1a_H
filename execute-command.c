@@ -75,7 +75,7 @@ execute_command (command_t c, bool time_travel)
 
 void execute_simple(command_t c)// c->word
 {
- 
+    
     int fd[2]={-1,-1};
     if (c->input != NULL)
     {
@@ -117,14 +117,14 @@ void execute_simple(command_t c)// c->word
         if(waitpid(p,&status,0)<0)// 0: blocking wait father process call wait
             error(1,0 ,"waited process error simple");
         c->status=WEXITSTATUS(status);
-        }
-
-        if(fd[0]>=0)
-            close(fd[0]);
-        if(fd[1]>=0)
-            close(fd[1]);
-        // c->status=exit_status;
-  
+    }
+    
+    if(fd[0]>=0)
+        close(fd[0]);
+    if(fd[1]>=0)
+        close(fd[1]);
+    // c->status=exit_status;
+    
     
 }
 // which order?
@@ -352,13 +352,14 @@ void execute_pipe(command_t c)// c->command[2]
 //int execute_graph(dependency_graph){}
 
 void execute_no_dependency(queue_t no_dependency);
-void execute_dependency(queue_t dependency);
+int  execute_dependency(queue_t dependency);
 
 int execute_graph(dependency_t dependency_graph)
 {
     execute_no_dependency(dependency_graph->no_dependency);
-    execute_dependency(dependency_graph->depedency);
-    return 0;///
+    
+    int final_status=execute_dependency(dependency_graph->depedency);
+    return final_status;///
 }
 
 void execute_no_dependency(queue_t no_dependency)
@@ -405,13 +406,14 @@ void execute_no_dependency(queue_t no_dependency)
      */
 }
 
-void execute_dependency(queue_t dependency)
+int execute_dependency(queue_t dependency)
 {
+    int status;
     queue_node_t queue_node_cursor=dependency->head;
     // for each node in queue
     while (queue_node_cursor != NULL)
     {
-        int status;
+        
         //for each graph node j in i->before
         //   struct graph_node** before;
         //loop through pointer of pointer
@@ -419,38 +421,38 @@ void execute_dependency(queue_t dependency)
         for (int i=0; i<queue_node_cursor->g->size_before_list;i++)
         {
             waitpid(queue_node_cursor->g->before[i]->pid,&status,0);
-        }// for loop ends here 
+        }// for loop ends here
         // no dependency now!
-            pid_t pid=fork();
-            if(pid==0)
-            {
-                execute_command(queue_node_cursor->g->command,true);
-                exit(0);
-            }
-            else
-            {
-                queue_node_cursor->g->pid=pid;   
-            }
-            // update cursor here
-            queue_node_cursor=queue_node_cursor->next;
-   }
-   
-  }
-    //graph node
-    /*
-     pseudo code:
-     
-     for each GraphNode i in dependencies
-     int status
-     for each GraphNode j in i->before
-     waitpid(j->pid, &status,0);
-     pid_t pid=fork();
-     if(pid==0)
-     execute_command(i->command)
-     exit(0)
-     else
-     i->pid=pid;
-     
-     */
+        pid_t pid=fork();
+        if(pid==0)
+        {
+            execute_command(queue_node_cursor->g->command,true);
+            exit(0);
+        }
+        else
+        {
+            queue_node_cursor->g->pid=pid;
+        }
+        // update cursor here
+        queue_node_cursor=queue_node_cursor->next;
+    }
+    return status;
+}
+//graph node
+/*
+ pseudo code:
+ 
+ for each GraphNode i in dependencies
+ int status
+ for each GraphNode j in i->before
+ waitpid(j->pid, &status,0);
+ pid_t pid=fork();
+ if(pid==0)
+ execute_command(i->command)
+ exit(0)
+ else
+ i->pid=pid;
+ 
+ */
 
 //other edge cases? after list?
