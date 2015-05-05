@@ -100,10 +100,9 @@ struct queue_node
 struct queue //linked list of queue node
 {
     struct queue_node* head;
+    struct queue_node* cursor;
     struct queue_node* tail;
 };
-
-//create a list node {graph node, RL, WL}? where should i put RL, WL?
 
 struct dependency_graph
 {
