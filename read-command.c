@@ -812,7 +812,8 @@ read_command_stream (command_stream_t s)
 //void process_command(command_t c){}
 
 void process_command (list_node_t node,command_t cmd, int *index_r, int * index_w);
-bool haveDependency(command_t A, command_t B);
+bool haveDependency(list_node_t A,list_node_t B);
+bool intersect(char ** a, char** b);
 
 //need fix: each tree has separate read/write list
 char ** read_list[10]={0};
@@ -871,18 +872,18 @@ list_stream_t init_list_stream()
 }
 // initial graphnode
 graph_node_t init_graph_node(command_t cmd){
-    graph_node_t g=(struct graph_node_t) checked_malloc(sizeof(struct graph_node));
+    graph_node_t g=( graph_node_t) checked_malloc(sizeof( graph_node_t));
     
     g->command=cmd;
     g->pid=-1;
     g->size_before_list=0;
-    g->before =(graph_node**)checked_malloc(sizeof(struct graph_node*)*MAX_BEFORE);
+    g->before =(graph_node_t*)checked_malloc(sizeof(graph_node_t)* MAX_BEFORE);
     return g;
 }
 // initial list node
 list_node_t init_list_node(graph_node_t node)
 {
-    list_node_t l= (struct list_node_t) checked_malloc(sizeof(struct list_node));
+    list_node_t l= ( list_node_t) checked_malloc(sizeof(struct list_node));
     l->graph_node=node;
     l->next=NULL;
     l->read_list=(char**)checked_malloc(sizeof(char*)*100);//
@@ -890,24 +891,24 @@ list_node_t init_list_node(graph_node_t node)
     return l;
     
 }
-queue* init_queue()
+queue_t init_queue()
 {
-    struct queue *Q=(struct queue* )checked_malloc(sizeof( struct queue));
+    queue_t Q=(queue_t )checked_malloc(sizeof(queue_t));
     Q->head=NULL;
     Q->cursor=NULL;
     Q->tail=NULL;
     return Q;
 }
-queue_node* init_queue_node()
+queue_node_t init_queue_node()
 {
-    struct queue_node* q=(struct queue_node*) checked_malloc(sizeof(struct queue_node));
+    queue_node_t q=(queue_node_t) checked_malloc(sizeof(queue_node_t));
     q->g=NULL;
     q->next=NULL;
     return q;
 }
 dependency_t init_dependency_graph()
 {
-    dependency_t d = (struct dependency_t) checked_malloc(sizeof(struct dependency_graph));
+    dependency_t d = (dependency_t) checked_malloc(sizeof(struct dependency_graph));
     d->no_dependency=init_queue();
     d->dependency=init_queue();
     return d;
@@ -960,7 +961,7 @@ dependency_t create_graph(command_stream_t s)
         }
         
         //1. generate RL, WL for command tree
-        process_command( stream->cursor, stream->cursor->command, &index_r, &index_w);//save the rl and wl inside
+        process_command( stream->cursor, stream->cursor->graph_node->command, &index_r, &index_w);//save the rl and wl inside
         
         stream->cursor->read_list[index_r]=NULL;
         stream->cursor->write_list[index_w]=NULL;
@@ -987,7 +988,7 @@ dependency_t create_graph(command_stream_t s)
             if (d->no_dependency->head==NULL) {
                 d->no_dependency->head = init_queue_node();
                 d->no_dependency->head->g=stream->cursor->graph_node;
-                d->no_dependency->cursor=head;
+                d->no_dependency->cursor=d->no_dependency->head;
             }
             else
             {
@@ -1002,7 +1003,7 @@ dependency_t create_graph(command_stream_t s)
             if (d->dependency->head==NULL) {
                 d->dependency->head = init_queue_node();
                 d->dependency->head->g=stream->cursor->graph_node;
-                d->dependency->cursor=head;
+                d->dependency->cursor=d->dependency->head;
             }
             else
             {
@@ -1032,7 +1033,7 @@ void process_command(list_node_t node,command_t cmd, int *index_r, int * index_w
         if (cmd->input!=NULL) {
             node->read_list[*index_r]=(char*) checked_malloc(sizeof(char)*100);
             strcpy(node->read_list[*index_r], cmd->input);
-            *index_r++;
+            *index_r = *index_r+1;
         }
         
         //store word[1]...word[n]
@@ -1044,15 +1045,15 @@ void process_command(list_node_t node,command_t cmd, int *index_r, int * index_w
             if (cmd->u.word[i][0]!='-') {
                 node->read_list[*index_r]=(char*)checked_malloc(sizeof(char)*100);
                 strcpy(node->read_list[*index_r], cmd->u.word[i]);
-                *index_r++;
+                *index_r =*index_r+1;
             }
             i++;
         }
         // write list
-        if (node->command->output!=NULL) {
+        if (cmd->output!=NULL) {
             node->write_list[*index_w]=(char*) checked_malloc(sizeof(char)*100);
             strcpy(node->write_list[*index_w], cmd->output);
-            *index_w++;
+            *index_w=*index_w+1;
         }
     }
     
@@ -1062,17 +1063,17 @@ void process_command(list_node_t node,command_t cmd, int *index_r, int * index_w
         if (cmd->input!=NULL) {
             node->read_list[*index_r]=(char*) checked_malloc(sizeof(char)*100);
             strcpy(node->read_list[*index_r], cmd->input);
-            *index_r++;
+            *index_r = *index_r+1;
         }
         
         // write list
         if (cmd->output!=NULL) {
             node->write_list[*index_w]=(char*) checked_malloc(sizeof(char)*100);
             strcpy(node->write_list[*index_w], cmd->output);
-            *index_w++;
+            *index_w =*index_w+1;
         }
         
-        process_command(cmd->u.subshell_command, index_r, index_w);
+        process_command(node,cmd->u.subshell_command, index_r, index_w);
     }
     else
     {
