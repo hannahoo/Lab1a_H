@@ -376,6 +376,8 @@ void execute_no_dependency(queue_t no_dependency)
         else
         {
             queue_node_cursor->g->pid=pid;
+	   // queue_node_cursor->g->command->status=1;
+
         }
         
         queue_node_cursor=queue_node_cursor->next;
@@ -432,6 +434,8 @@ int execute_dependency(queue_t dependency)
         else
         {
             queue_node_cursor->g->pid=pid;
+	    queue_node_cursor->g->command->status=WEXITSTATUS(status);
+
         }
         // update cursor here
         queue_node_cursor=queue_node_cursor->next;
