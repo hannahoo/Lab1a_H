@@ -26,7 +26,7 @@ command_indented_print (int indent, command_t c)
       }
 
     case SIMPLE_COMMAND:
-      {
+      {a
 	char **w = c->u.word;
 	printf ("%*s%s", indent, "", *w);
 	while (*++w)
@@ -43,11 +43,46 @@ command_indented_print (int indent, command_t c)
     default:
       abort ();
     }
+//initial -1, standard 0, <>:1 ?, <&: 2 
+  if (c->input){
+  	switch(c->input_mode){
+  		case 0:
+  			printf ("<%s", c->input);
+  			break;
+  		case 1:
+  			printf ("<>%s", c->input);
+  			break;
+  		default: // case 2
+  			printf ("<&%s", c->input);
+  			
+  			
+  		
+  	}
+  
+  }
+//initial -1, standard 0, <>:1, >& :2, >>: 3, >| 4
 
-  if (c->input)
-    printf ("<%s", c->input);
   if (c->output)
-    printf (">%s", c->output);
+  {
+  		switch(c->input_mode){
+  		case 0:
+  			printf (">%s", c->output);
+  			break;
+  		case 1:
+  			printf ("<>%s", c->output);
+  			break;
+  		case 2:
+  			printf (">&%s", c->output);
+  			break;
+  		case 3:
+  			printf (">>%s", c->output);
+  			break;
+  		default: // case 4
+  			printf (">|%s", c->output);
+  			break;
+  			
+  }
+   
 }
 
 void
