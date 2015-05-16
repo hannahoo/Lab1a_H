@@ -50,7 +50,8 @@ int count_left_bracket=0;
 int line_number =1;
 bool wait_input =false; //sign for <
 bool wait_output =false; // >
-
+int in_mode;
+int out_mode;
 //auxiliary functions
 bool isWord (char c)
 {
@@ -90,6 +91,8 @@ command_t init_command(enum command_type type)
     command_t command=(command_t)checked_malloc(sizeof(struct command));
     command->type=type;
     command->status=-1;
+    command->input_mode=-1;// initial
+    command->output_mode=-1;
     command->input=NULL;
     command->output=NULL;
     command->u.word=NULL;
@@ -326,7 +329,8 @@ command_t build_command_t(char* buff, int* index, size_t ssize)// size=buff--rea
     count_left_bracket=0;
     wait_output=false;
     wait_input=false;
-    
+    in_mode=-1;
+    out_mode=-1;
     bool isReturn=false;
     while (*index<ssize &&(isReturn==false))
     {
@@ -528,7 +532,27 @@ command_t build_command_t(char* buff, int* index, size_t ssize)// size=buff--rea
                     error(1, 0, "%d: syntax error 13-1 < followed by newline ", line_number);
                 if(wait_input || wait_output)
                     error(1, 0, "%d: syntax error 13-2 < happens at wrong place", line_number);
-                
+                // input mode
+               //initial -1, standard 0, <>:1 ?, <&: 2 
+ 			
+                if((*index+1)<ssize){
+                	switch(buff[*index+1]){
+
+                		case '>':
+                			in_mode=1;
+                			*index=*index+1;
+                			out_mode=1;
+                			wait_output=true;
+                			break;
+                		case '&':
+                			in_mode=2;
+                			*index=*index+1;
+                			break;
+                		default: // standard : \0 or character
+                			in_mode=0;
+                	}
+
+                }
                 wait_input=true;
                 break;
                 
@@ -542,6 +566,27 @@ command_t build_command_t(char* buff, int* index, size_t ssize)// size=buff--rea
                     error(1, 0, "%d: syntax error 15-2 > happens at wrong place", line_number);
                 //command_t tmp=store_simple_command();// things needed
                 //push_cmd(tmp);
+                
+                //initial -1, standard 0, <>:1, >& :2, >>: 3, >| 4
+                if((*index+1)<ssize){
+                	switch(buff[*index+1]){	
+                		case '&':
+                			in_mode=2;
+                			*index=*index+1;
+                			break;
+                		case '>':
+                			in_mode=3;
+                			*index=*index+1;
+                			break;
+                		case '|':
+                			in_mode=4;
+                			*index=*index+1;
+                			break;
+                		default: // \0 or character
+                			in_mode=0;
+                	}
+
+                }
                 wait_output=true;
                 break;
                 
@@ -676,7 +721,9 @@ command_t build_command_t(char* buff, int* index, size_t ssize)// size=buff--rea
                     cmd_s.command[cmd_s.top-1]->input = (char*) checked_malloc(sizeof(char)*len);
                     strcpy(cmd_s.command[cmd_s.top-1]->input, text); // undefined text
                     *index=*index-1;//to get back one step since there's a ++ at the end
-                    wait_input=false;
+                    cmd_s.command[cmd_s.top-1]->input_mode=in_mode;
+                    in_mode=-1;
+					wait_input=false;
                     break;
                 }
                 if(wait_output)
@@ -690,6 +737,8 @@ command_t build_command_t(char* buff, int* index, size_t ssize)// size=buff--rea
                     cmd_s.command[cmd_s.top-1]->output = (char*) checked_malloc(sizeof(char)*len);
                     strcpy(cmd_s.command[cmd_s.top-1]->output, text); // undefined text
                     *index=*index-1;//
+                    cmd_s.command[cmd_s.top-1]->output_mode=out_mode;
+                    out_mode=-1;
                     wait_output =false;
                     break;
                 }
@@ -1082,7 +1131,6 @@ void process_command(list_node_t node,command_t cmd, int *index_r, int * index_w
         
     }
 }
-
 
 
 
