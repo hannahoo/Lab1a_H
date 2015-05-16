@@ -39,12 +39,16 @@ enum token
 // Data associated with a command.
 struct command
 {
+
   enum command_type type;
 
   // Exit status, or -1 if not known (e.g., because it has not exited yet).
   int status;
 
   // I/O redirections, or null if none.
+  int input_mode;//initial -1, standard 0, <>:1, >& :2, >>: 3, >| 4
+  int output_mode;//initial -1, standard 0, <>:1 ?, <&: 2 
+  
   char *input;
   char *output;
 
@@ -71,6 +75,7 @@ struct command_node
 {
     struct command *c;
     struct command_node *next;
+   
 
 };
 
