@@ -68,9 +68,7 @@ command_indented_print (int indent, command_t c)
   		case 0:
   			printf (">%s", c->output);
   			break;
-  		case 1:
-  			printf ("<>%s", c->output);
-  			break;
+  	
   		case 2:
   			printf (">&%s", c->output);
   			break;
