@@ -639,8 +639,8 @@ free_block(uint32_t blockno)
 	uint32_t bit_no= ( blockno%OSPFS_BLKBITSIZE )%32;
 	uint32_t *add = ospfs_block(blk_no + OSPFS_FREEMAP_BLK);
 	bitvector_set(add+ vec_no,bit_no);
-	
-/*	if(blk_no<OSPFS_FREEMAP_BLK || blk_no >= ospfs_super->os_firstinob)
+	/*
+	if(blk_no<OSPFS_FREEMAP_BLK || blk_no >= ospfs_super->os_firstinob)
 		eprintk(" block to be freed is at wrong block \n");
 	if(bitvector_test(add+ vec_no, bit_no))
 	   eprintk(" block to be freed is not currently used \n");
@@ -1184,7 +1184,7 @@ ospfs_write(struct file *filp, const char __user *buffer, size_t count, loff_t *
 	/* EXERCISE: Your code here */
 	
 	//check if file is open
-	if(	filp -> f_flags == O_APPEND)
+	if(	filp -> f_flags & O_APPEND)
 		*f_pos = oi -> oi_size;
 
 	// If the user is writing past the end of the file, change the file's
@@ -1317,8 +1317,10 @@ create_blank_direntry(ospfs_inode_t *dir_oi)
 			//found a blank directory entry
 			return od;
 		}
+	}
 		//can't find blank directory entry
-
+		// allocate a new block
+		
 
 		new_size = (ospfs_size2nblocks ( dir_oi -> oi_size) +1) *OSPFS_BLKSIZE;
 
@@ -1332,7 +1334,6 @@ create_blank_direntry(ospfs_inode_t *dir_oi)
 			return ospfs_inode_data (dir_oi, offset);
 		}
 		
-	}
 	return ERR_PTR(-EINVAL); // Replace this line
 }
 
