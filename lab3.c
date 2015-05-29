@@ -931,8 +931,8 @@ remove_block(ospfs_inode_t *oi)
 		alloc_2[(n-OSPFS_NDIRECT-OSPFS_NINDIRECT-1)%OSPFS_NINDIRECT]=0;
 		
 		if(alloc_2[0]==0){
-			free(alloc_1[(n-OSPFS_NDIRECT-OSPFS_NINDIRET-1)/OSPFS_NINDIRECT]);
-			alloc_1[(n-OSPFS_NDIRECT-OSPFS_NINDIRET-1)/OSPFS_NINDIRECT]=0;
+			free_block(alloc_1[(n-OSPFS_NDIRECT-OSPFS_NINDIRECT-1)/OSPFS_NINDIRECT]);
+			alloc_1[(n-OSPFS_NDIRECT-OSPFS_NINDIRECT-1)/OSPFS_NINDIRECT]=0;
 		}
 	
 		if(alloc_1[0]==0)
@@ -1168,7 +1168,7 @@ ospfs_write(struct file *filp, const char __user *buffer, size_t count, loff_t *
 	int retval = 0;
 	size_t amount = 0;
 	unsigned long result = -1;
-
+	size_t size;
 	// Support files opened with the O_APPEND flag.  To detect O_APPEND,
 	// use struct file's f_flags field and the O_APPEND bit.
 	/* EXERCISE: Your code here */
@@ -1181,7 +1181,7 @@ ospfs_write(struct file *filp, const char __user *buffer, size_t count, loff_t *
 	// size to accomodate the request.  (Use change_size().)
 	/* EXERCISE: Your code here */
 
-	size_t size = oi -> oi_size; // file size
+	 size= oi -> oi_size; // file size
 	if (*f_pos + count > size)
 		if (change_size (oi, *f_pos+count) <0 )
 			goto done; 
@@ -1360,13 +1360,14 @@ ospfs_link(struct dentry *src_dentry, struct inode *dir, struct dentry *dst_dent
 	/* EXERCISE: Your code here. */
 	ospfs_inode_t *dir_oi = ospfs_inode(dir->i_ino);
 	uint32_t entry_ino = 0;
+	ospfs_direntry_t *new_entry = NULL;
 	/* EXERCISE: Your code here. */
 	if (dst_dentry -> d_name.len > OSPFS_MAXNAMELEN)
 		return -ENAMETOOLONG;
 	if (find_direntry (dir_oi, dst_dentry -> d_name.name, dst_dentry ->d_name.len) !=NULL)
 		return -EEXIST;
 	
-	ospfs_direntry_t *new_entry = NULL;
+	
 	
 	new_entry = create_blank_direntry (dir_oi); 
 	
@@ -1558,7 +1559,7 @@ ospfs_follow_link(struct dentry *dentry, struct nameidata *nd)
 	{
 		int pivot = strchr (oi -> oi_symlink, ':') - oi -> oi_symlink;
 
-		if (current -> uid == 0) //root user
+		if (current-> uid == 0) //root user
 		{
 			oi -> oi_symlink[pivot] = '\0';
 			nd_set_link (nd, oi->oi_symlink +5 +1);
