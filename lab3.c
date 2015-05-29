@@ -897,8 +897,6 @@ remove_block(ospfs_inode_t *oi)
 {
 	// current number of blocks in file
 	uint32_t n = ospfs_size2nblocks(oi->oi_size);
-	uint32_t *alloc=0;
-	uint32_t *alloc_1=0, *alloc_2=0;
 	uint32_t *allocated[2]={0 , 0};
 	/* EXERCISE: Your code here */
 	if(n<=OSPFS_NDIRECT){
