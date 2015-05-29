@@ -640,10 +640,11 @@ free_block(uint32_t blockno)
 	uint32_t *add = ospfs_block(blk_no + OSPFS_FREEMAP_BLK);
 	bitvector_set(add+ vec_no,bit_no);
 	
-	if(blk_no<OSPFS_FREEMAP_BLK || blk_no >= ospfs_super->os_firstinob)
+/*	if(blk_no<OSPFS_FREEMAP_BLK || blk_no >= ospfs_super->os_firstinob)
 		eprintk(" block to be freed is at wrong block \n");
 	if(bitvector_test(add+ vec_no, bit_no))
 	   eprintk(" block to be freed is not currently used \n");
+	   */
 }
 
 
@@ -898,8 +899,6 @@ remove_block(ospfs_inode_t *oi)
 {
 	// current number of blocks in file
 	uint32_t n = ospfs_size2nblocks(oi->oi_size);
-	uint32_t *alloc=0;
-	uint32_t *alloc_1=0, *alloc_2=0;
 	uint32_t *allocated[2]={0 , 0};
 	/* EXERCISE: Your code here */
 	if(n<=OSPFS_NDIRECT){
