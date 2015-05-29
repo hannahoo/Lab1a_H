@@ -489,7 +489,7 @@ ospfs_dir_readdir(struct file *filp, void *dirent, filldir_t filldir)
 		if(od->od_ino !=0)
 		{
 			entry_oi = ospfs_inode(od->od_ino);
-			if(entry_oi==NULL)
+			if(entry_oi== 0)
 			{
 				r= -EIO;break;
 			}
@@ -605,7 +605,7 @@ allocate_block(void)
 	for(blk_no=OSPFS_FREEMAP_BLK;blk_no<ospfs_super->os_firstinob; blk_no++)
 	{
 		uint32_t *add = ospfs_block(blk_no); // pointer to that block
-		for(vec_no=0; vec_no<OSPFS_BLKSIZE/4; vec_no++)
+		for(vec_no=0; vec_no<OSPFS_BLKBITSIZE/32; vec_no++)
 			for(bit_no=0; bit_no < 32; bit_no++)
 			{
 				if(bitvector_test (add + vec_no, bit_no)){
@@ -635,14 +635,15 @@ free_block(uint32_t blockno)
 {
 	/* EXERCISE: Your code here */
 	uint32_t blk_no=blockno/OSPFS_BLKBITSIZE;
-	uint32_t vec_no=( blockno - blk_no*OSPFS_BLKBITSIZE )/32;
-	uint32_t bit_no= blockno - blk_no*OSPFS_BLKBITSIZE - vec_no*32;
+	uint32_t vec_no=( blockno%OSPFS_BLKBITSIZE )/32;
+	uint32_t bit_no= ( blockno%OSPFS_BLKBITSIZE )%32;
 	uint32_t *add = ospfs_block(blk_no + OSPFS_FREEMAP_BLK);
+	bitvector_set(add+ vec_no,bit_no);
+	
 	if(blk_no<OSPFS_FREEMAP_BLK || blk_no >= ospfs_super->os_firstinob)
 		eprintk(" block to be freed is at wrong block \n");
 	if(bitvector_test(add+ vec_no, bit_no))
 	   eprintk(" block to be freed is not currently used \n");
-	bitvector_set( add+ vec_no, bit_no);
 }
 
 
@@ -789,11 +790,11 @@ add_block(ospfs_inode_t *oi)
 		
 			allocated[0]=ospfs_block(oi->oi_indirect);
 			
-			if(allocated[0][n-OSPFS_NINDIRECT]==0){
+			if(allocated[0][n-OSPFS_NDIRECT]==0){
 				//allocate a new block to save data
-				allocated[0][n-OSPFS_NINDIRECT]=allocate_block();
+				allocated[0][n-OSPFS_NDIRECT]=allocate_block();
 				//fail
-				if(allocated[0][n-OSPFS_NINDIRECT]==0)
+				if(allocated[0][n-OSPFS_NDIRECT]==0)
 				{
 					if(is_allocated)
 					free_block(oi->oi_indirect);
@@ -801,7 +802,7 @@ add_block(ospfs_inode_t *oi)
 				}	
 			}
 			// successful
-		allocated[1]=ospfs_block(allocated[0][n-OSPFS_NINDIRECT]);
+		allocated[1]=ospfs_block(allocated[0][n-OSPFS_NDIRECT]);
 		memset(allocated[1],0,OSPFS_BLKSIZE);
 		
 	}
@@ -897,6 +898,8 @@ remove_block(ospfs_inode_t *oi)
 {
 	// current number of blocks in file
 	uint32_t n = ospfs_size2nblocks(oi->oi_size);
+	uint32_t *alloc=0;
+	uint32_t *alloc_1=0, *alloc_2=0;
 	uint32_t *allocated[2]={0 , 0};
 	/* EXERCISE: Your code here */
 	if(n<=OSPFS_NDIRECT){
